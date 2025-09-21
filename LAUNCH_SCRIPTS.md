@@ -24,7 +24,7 @@ This document provides details about the launch scripts created for the Star Cit
 - 🛡️ **Error Handling**: Comprehensive error checking and user guidance
 
 **How it Works:**
-1. Downloads Python 3.13 embedded distribution (~9MB) to `./python/` folder
+1. Downloads Python 3.13 embedded distribution (~11MB) to `./python/` folder
 2. Configures embedded Python to support pip
 3. Creates virtual environment in `./venv/` folder
 4. Installs requirements from `requirements.txt`
