@@ -79,7 +79,6 @@ Scanning-Tool/
 ├── launch_linux.sh          # Linux launcher
 ├── launch_windows.bat       # Windows launcher (batch)
 ├── launch_windows.ps1       # Windows launcher (PowerShell)
-├── launch_macos.sh          # macOS launcher
 ├── test_environment.py      # Environment tester
 ├── scan_deposits.py         # Main application
 ├── requirements.txt         # Python dependencies
@@ -100,7 +99,7 @@ Scanning-Tool/
 3. Wait for automatic setup to complete
 4. Application launches automatically
 
-**Linux/macOS Users:**
+**Linux Users:**
 1. Download the project
 2. Open terminal in project directory
 3. Run `./launch_linux.sh` or `./launch_macos.sh`
@@ -155,8 +154,3 @@ pip install -r requirements.txt
 - **Python Not Found**: Install with package manager (apt, dnf, pacman, etc.)
 - **Permission Denied**: Run `chmod +x launch_linux.sh`
 - **Virtual Environment Issues**: Install `python3-venv` package
-
-### macOS
-- **Python Not Found**: Install from python.org or use Homebrew
-- **Permission Denied**: Run `chmod +x launch_macos.sh`
-- **Gatekeeper Issues**: Right-click → Open for first run
