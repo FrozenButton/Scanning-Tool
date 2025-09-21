@@ -4,6 +4,7 @@ import json
 import io
 import base64
 import os
+import sys
 from threading import Thread
 from PIL import Image
 import cv2
@@ -20,37 +21,33 @@ import shutil
 import webbrowser
 
 def ensure_ollama_installed():
-    """Check if Ollama is installed. If not, run bundled installer."""
+    """
+    Check if Ollama is installed on the system (cross-platform).
+    If not found, direct user to download from official website rather than using embedded installer.
+    Works on Windows and Linux.
+    """
     if not shutil.which("ollama"):
-        print("Ollama not found. Installing from bundled OllamaSetup.exe...")
-
-        installer_path = resource_path("OllamaSetup.exe")
-
+        print("Ollama not found on your system.")
+        print("Please install Ollama from the official website: https://ollama.com/")
+        
+        # Show a popup with installation instructions
+        messagebox.showinfo(
+            "Ollama Required",
+            "Ollama is required but not installed.\n\n"
+            "Please visit https://ollama.com/ to download and install Ollama for your operating system.\n\n"
+            "After installation, restart this program to continue."
+        )
+        
+        # Open the website in the default browser
         try:
-            subprocess.run([installer_path, "/quiet", "/norestart"], check=True)
-            print("Ollama installed successfully.")
-            print("Please close this window and restart the program to continue.")
-
-            # Show a popup for clarity
-            messagebox.showinfo(
-                "Ollama Installed",
-                "Ollama has been installed successfully.\n\n"
-                "Please close this program and restart it to continue."
-            )
-
-            # Keep program open instead of auto-exit
-            input("\nPress ENTER to close...")
-            sys.exit(0)
-
+            webbrowser.open("https://ollama.com/")
         except Exception as e:
-            print("Failed to install Ollama:", e)
-            messagebox.showerror(
-                "Ollama Install Failed",
-                f"Failed to install Ollama automatically.\n\nError: {e}\n\n"
-                "Please install Ollama manually and rerun this program."
-            )
-            input("\nPress ENTER to close...")
-            sys.exit(1)
+            print(f"Could not open browser automatically: {e}")
+            print("Please manually visit https://ollama.com/ to download Ollama")
+        
+        # Wait for user acknowledgment
+        input("\nPress ENTER to close after installing Ollama...")
+        sys.exit(0)
 
     else:
         try:
@@ -121,7 +118,6 @@ def save_config():
 
 
 # ---------- Load Rock Types JSON ----------
-import sys
 
 def resource_path(relative_path):
     """Get absolute path to resource, works for dev and for PyInstaller bundle."""
@@ -483,11 +479,16 @@ def status():
 
 
 def hotkey_listener():
-    keyboard.add_hotkey("7", capture_once)
-    keyboard.add_hotkey("ctrl+7", toggle_continuous)
-
-    keyboard.add_hotkey("8", toggle_border)
-    keyboard.wait()
+    """Set up hotkey listeners with cross-platform error handling."""
+    try:
+        keyboard.add_hotkey("7", capture_once)
+        keyboard.add_hotkey("ctrl+7", toggle_continuous)
+        keyboard.add_hotkey("8", toggle_border)
+        print("Hotkeys registered: '7' for single scan, 'Ctrl+7' for continuous toggle, '8' for border toggle")
+        keyboard.wait()
+    except Exception as e:
+        print(f"Could not set up global hotkeys: {e}")
+        print("Note: Linux Support is being tested.")
 
 
 # ---------- Main ----------
