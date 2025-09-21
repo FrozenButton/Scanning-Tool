@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: rgba(0,0,0,0); }
+    .container { padding: 8px; background: rgba(0,0,0,0.45); color: white; border-radius: 8px; }
+    h1 { margin: 0; font-size: 24px; }
+    p { margin: 3px 0; font-size: 16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px; }
+    th, td { border: 1px solid #666; padding: 4px; text-align: center; }
+    th { background: #222; color: #fff; }
+    td { background: #111; }
+    .toggle { margin-top: 8px; }
+    .small { font-size: 12px; opacity: 0.8; }
+    .legend span { margin-right: 6px; padding: 2px 6px; border-radius: 4px; color: #000; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="container" id="box">
+  <h1 id="name">No code</h1>
+  <p id="code"></p>
+  <p id="raw" class="small"></p>
+  <div class="toggle">
+    <label><input type="radio" name="region" value="STANTON" checked> Stanton</label>
+    <label><input type="radio" name="region" value="PYRO"> Pyro</label>
+  </div>
+  <div class="legend" style="margin-top:8px; font-size:12px;">
+    <span style="background:#E88AFF;">Highest</span>
+    <span style="background:#63E64C;">High</span>
+    <span style="background:#E6E14C;">Medium</span>
+    <span style="background:#E69E4C;">Low</span>
+  </div>
+  <div id="minerals"></div>
+</div>
+<script>
+let region = "STANTON";
+document.querySelectorAll('input[name="region"]').forEach(el=>{
+  el.addEventListener("change", e=>{
+    region = e.target.value;
+    poll();
+  });
+});
+
+function renderTable(data){
+  let html = '<table><tr><th>Mineral</th><th>Prob</th><th>Min</th><th>Max</th><th>Med</th></tr>';
+  for(const row of data){
+    html += `<tr>
+      <td style="color:${row.color}; font-weight:bold;">${row.name}</td>
+      <td>${row.prob}</td>
+      <td>${row.min}</td>
+      <td>${row.max}</td>
+      <td>${row.med}</td>
+    </tr>`;
+  }
+  html += '</table>';
+  document.getElementById('minerals').innerHTML = html;
+}
+
+async function poll(){
+  try {
+    const r = await fetch('/status?region='+region);
+    const j = await r.json();
+    if(j.info){
+      let text = j.info.name;
+      if(j.info.deposits){ text += " x" + j.info.deposits; }
+      document.getElementById('name').textContent = text;
+      document.getElementById('code').textContent = "Code: " + (j.code ?? "");
+      document.getElementById('raw').textContent = j.code_raw ? ("(raw: " + j.code_raw + ", conf " + j.confidence.toFixed(2) + ")") : "";
+      if(j.table){ renderTable(j.table); }
+    }
+  } catch(e){ console.error(e); }
+  setTimeout(poll, 500);
+}
+poll();
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+pillow
+opencv-python
+numpy
+mss
+flask
+keyboard
+ollama
