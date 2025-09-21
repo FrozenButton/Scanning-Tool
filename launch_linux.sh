@@ -77,7 +77,7 @@ echo "Press Ctrl+C to stop the application"
 echo ""
 
 cd "$SCRIPT_DIR"
-python scan_deposits.py
+$PYTHON_CMD scan_deposits.py
 
 echo ""
 echo "Application closed."
