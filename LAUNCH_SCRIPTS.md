@@ -58,19 +58,6 @@ powershell -ExecutionPolicy Bypass -File launch_windows.ps1
 ./launch_linux.sh
 ```
 
-### macOS Script (`launch_macos.sh`)
-
-**Key Features:**
-- 🍎 **macOS Optimized**: Handles both Intel and Apple Silicon Macs
-- 🔍 **Multiple Install Options**: Guides users to Homebrew, Python.org, or pyenv
-- 🔧 **Virtual Environment**: Creates isolated environment
-- ⚡ **Fast Setup**: Reuses existing installations when possible
-
-**Usage:**
-```bash
-./launch_macos.sh
-```
-
 ## Environment Testing
 
 The `test_environment.py` script can be used to verify the environment setup:
