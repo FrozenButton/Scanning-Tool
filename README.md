@@ -159,6 +159,7 @@ If this tool helps your mining operations, please:
 - ⭐ **Star this repository** on GitHub
 - 🍴 **Share it** with other Star Citizen miners
 - 🐛 **Report bugs** to help make it better
+- 🤝 **Contribute code** via pull requests
 
 ---
 
