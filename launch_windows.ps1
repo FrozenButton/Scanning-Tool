@@ -18,10 +18,9 @@ $PythonUrl = "https://www.python.org/ftp/python/3.13.7/python-3.13.7-embed-amd64
 Write-Host "Script directory: $ScriptDir"
 
 # Function to download with progress
-function Download-File {
+function Get-File {
     param($Url, $Output)
     try {
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         $WebClient = New-Object System.Net.WebClient
         $WebClient.DownloadFile($Url, $Output)
         return $true
@@ -48,7 +47,7 @@ if ((-not (Test-Path $PythonExe)) -or $Force) {
         Write-Host "Downloading Python $PythonVersion embedded distribution..."
         Write-Host "This may take a few minutes depending on your internet connection..."
         
-        if (Download-File $PythonUrl $ZipPath) {
+        if (Get-File $PythonUrl $ZipPath) {
             Write-Host "Download completed!" -ForegroundColor Green
             
             # Extract Python
@@ -62,7 +61,9 @@ if ((-not (Test-Path $PythonExe)) -or $Force) {
             $PthFile = Join-Path $PythonDir "python313._pth"
             if (Test-Path $PthFile) {
                 Write-Host "Configuring Python for pip support..."
-                (Get-Content $PthFile) -replace '^#import site', 'import site' | Set-Content $PthFile
+                $PthLines = Get-Content $PthFile
+                $PthLines = $PthLines | ForEach-Object { $_ -replace '^#import site', 'import site' }
+                Set-Content $PthFile -Value $PthLines
             }
             
             # Install pip
@@ -106,7 +107,7 @@ $ActivateScript = Join-Path $VenvDir "Scripts\Activate.ps1"
 
 # Upgrade pip
 Write-Host "Upgrading pip..."
-python -m pip install --upgrade pip
+& "$VenvDir\Scripts\python.exe" -m pip install --upgrade pip
 
 # Install requirements
 $ReqMarker = Join-Path $VenvDir ".requirements_installed"
@@ -122,7 +123,7 @@ elseif ((Get-Item $RequirementsTxt).LastWriteTime -gt (Get-Item $ReqMarker).Last
 
 if ($InstallRequired -or $Force) {
     Write-Host "Installing Python requirements..." -ForegroundColor Yellow
-    pip install -r $RequirementsTxt
+    & "$VenvDir\Scripts\pip.exe" install -r $RequirementsTxt
     New-Item -ItemType File -Path $ReqMarker -Force | Out-Null
     Write-Host "Requirements installed successfully" -ForegroundColor Green
 }
@@ -145,7 +146,7 @@ Write-Host "Press Ctrl+C to stop the application"
 Write-Host ""
 
 Set-Location $ScriptDir
-python scan_deposits.py
+& "$VenvDir\Scripts\python.exe" scan_deposits.py
 
 Write-Host ""
 Write-Host "Application closed." -ForegroundColor Green
