@@ -8,7 +8,6 @@ This document provides details about the launch scripts created for the Star Cit
 1. **`launch_linux.sh`** - Linux/Unix launch script
 2. **`launch_windows.bat`** - Windows batch script  
 3. **`launch_windows.ps1`** - Windows PowerShell script (alternative)
-4. **`launch_macos.sh`** - macOS launch script
 
 ### Support Files
 5. **`test_environment.py`** - Environment testing script
