@@ -7,7 +7,6 @@ This document provides details about the launch scripts created for the Star Cit
 ### Launch Scripts
 1. **`launch_linux.sh`** - Linux/Unix launch script
 2. **`launch_windows.bat`** - Windows batch script  
-3. **`launch_windows.ps1`** - Windows PowerShell script (alternative)
 
 ### Support Files
 5. **`test_environment.py`** - Environment testing script
@@ -15,7 +14,7 @@ This document provides details about the launch scripts created for the Star Cit
 
 ## Features
 
-### Windows Scripts (`launch_windows.bat` & `launch_windows.ps1`)
+### Windows Script (`launch_windows.bat`)
 
 **Key Features:**
 - 🐍 **Portable Python Installation**: Automatically downloads and installs Python 3.13 embedded distribution
@@ -35,9 +34,6 @@ This document provides details about the launch scripts created for the Star Cit
 ```cmd
 # Batch version (recommended)
 launch_windows.bat
-
-# PowerShell version (alternative)
-powershell -ExecutionPolicy Bypass -File launch_windows.ps1
 ```
 
 ### Linux Script (`launch_linux.sh`)
@@ -77,7 +73,6 @@ python test_environment.py
 Scanning-Tool/
 ├── launch_linux.sh          # Linux launcher
 ├── launch_windows.bat       # Windows launcher (batch)
-├── launch_windows.ps1       # Windows launcher (PowerShell)
 ├── test_environment.py      # Environment tester
 ├── scan_deposits.py         # Main application
 ├── requirements.txt         # Python dependencies
@@ -145,7 +140,6 @@ pip install -r requirements.txt
 ## Troubleshooting
 
 ### Windows
-- **PowerShell Execution Policy**: Use `powershell -ExecutionPolicy Bypass -File launch_windows.ps1`
 - **Antivirus Blocking**: Whitelist the project folder
 - **Network Issues**: Check firewall settings for Python downloads
 

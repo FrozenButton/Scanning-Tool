@@ -31,7 +31,7 @@ cd Scanning-Tool
 
 This tool helps Star Citizen miners by:
 - 📸 **Taking screenshots** of deposit codes on your screen
-- 🤖 **Reading the numbers** using AI (no more squinting!)
+- 🤖 **Reading the numbers** using AI
 - 📊 **Telling you what type of deposit** it is and how valuable the materials are
 - 📍 **Showing an overlay** on your screen with the deposit information
 
