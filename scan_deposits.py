@@ -46,6 +46,7 @@ def ensure_ollama_installed():
             print("Please manually visit https://ollama.com/ to download Ollama")
         
         # Wait for user acknowledgment
+        input("After installing Ollama, press ENTER to continue...")
         input("\nPress ENTER to close after installing Ollama...")
         sys.exit(0)
 
