@@ -35,6 +35,29 @@ This tool helps Star Citizen miners by:
 - 📊 **Telling you what type of deposit** it is and how valuable the materials are
 - 📍 **Showing an overlay** on your screen with the deposit information
 
+## 💻 System Requirements
+
+**⚠️ This tool is designed for mid to high-end gaming PCs and is NOT intended for low-spec machines.**
+
+Since this tool runs alongside Star Citizen, you'll need:
+
+### Recommended Requirements
+- **VRAM**: 8GB+ dedicated graphics memory (tool uses ~1.73GB for AI model)
+- **RAM**: 32GB+ system memory (Star Citizen + this tool)
+- **CPU**: Modern multi-core processor
+- **OS**: Windows 10/11 or Linux (64-bit)
+
+### Why these requirements?
+- The AI model (**qwen2.5vl:3b**) requires **~1.73GB of VRAM** to run efficiently
+- Star Citizen is already demanding on system resources
+- Running both simultaneously requires adequate hardware
+
+> 💡 **Performance Tip**: If you experience lag or performance issues, close the scanner when not actively mining, or consider upgrading your graphics card or RAM.
+
+> ⚠️ **VRAM Note**: If your graphics card doesn't have enough VRAM, Ollama will automatically fall back to using your CPU for AI processing. This will work but will be significantly slower and may impact game performance more than GPU processing.
+
+---
+
 ## 🎮 How to use it (Super Easy!)
 
 ### For Windows Users (Most People)
