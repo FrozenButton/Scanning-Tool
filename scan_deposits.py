@@ -19,6 +19,15 @@ import tkinter.messagebox as messagebox
 import subprocess
 import shutil
 import webbrowser
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 def ensure_ollama_installed():
     """
@@ -30,16 +39,16 @@ def ensure_ollama_installed():
         import platform
         system = platform.system().lower()
         
-        print("Ollama not found on your system.")
-        print("Ollama is required for AI-powered code recognition.")
-        print()
+        logger.info("Ollama not found on your system.")
+        logger.info("Ollama is required for AI-powered code recognition.")
+        logger.info()
         
         if system == "windows":
             # Windows - offer automatic download and install
-            print("=== Windows Installation Options ===")
-            print("1. Automatic download and install (Recommended)")
-            print("2. Manual download from website")
-            print()
+            logger.info("=== Windows Installation Options ===")
+            logger.info("1. Automatic download and install (Recommended)")
+            logger.info("2. Manual download from website")
+            logger.info()
             
             choice = input("Would you like to automatically download and install Ollama? (y/n): ").lower().strip()
             
@@ -50,9 +59,9 @@ def ensure_ollama_installed():
                     ollama_url = "https://ollama.com/download/OllamaSetup.exe"
                     installer_path = os.path.join(os.getcwd(), "OllamaSetup.exe")
                     
-                    print("Downloading Ollama installer...")
-                    print(f"URL: {ollama_url}")
-                    print(f"Saving to: {installer_path}")
+                    logger.info("Downloading Ollama installer...")
+                    logger.info(f"URL: {ollama_url}")
+                    logger.info(f"Saving to: {installer_path}")
                     
                     # Download with progress
                     def show_progress(block_num, block_size, total_size):
@@ -62,38 +71,38 @@ def ensure_ollama_installed():
                             print(f"\rProgress: {percent}% ({downloaded // (1024*1024):.1f}MB / {total_size // (1024*1024):.1f}MB)", end="", flush=True)
                     
                     urllib.request.urlretrieve(ollama_url, installer_path, show_progress)
-                    print("\nDownload completed!")
+                    logger.info("\nDownload completed!")
                     
                     # Run installer
-                    print("Running Ollama installer...")
-                    print("Please follow the installation prompts.")
+                    logger.info("Running Ollama installer...")
+                    logger.info("Please follow the installation prompts.")
                     result = subprocess.run([installer_path], check=False)
                     
                     # Clean up installer
                     try:
                         os.remove(installer_path)
-                        print("Installer file cleaned up.")
+                        logger.info("Installer file cleaned up.")
                     except:
                         pass
                     
                     if result.returncode == 0:
-                        print("Ollama installation completed!")
-                        print("Please restart this program to continue.")
+                        logger.info("Ollama installation completed!")
+                        logger.info("Please restart this program to continue.")
                     else:
-                        print("Installation may have been cancelled or failed.")
-                        print("You can try running the installer manually or visit https://ollama.com/")
+                        logger.warning("Installation may have been cancelled or failed.")
+                        logger.info("You can try running the installer manually or visit https://ollama.com/")
                     
                 except Exception as e:
-                    print(f"Error downloading Ollama: {e}")
-                    print("Please visit https://ollama.com/ to download manually.")
+                    logger.error(f"Error downloading Ollama: {e}")
+                    logger.info("Please visit https://ollama.com/ to download manually.")
                     webbrowser.open("https://ollama.com/")
             else:
-                print("Opening Ollama website for manual download...")
+                logger.info("Opening Ollama website for manual download...")
                 webbrowser.open("https://ollama.com/")
         
         elif system == "linux":
             # Linux - detect distribution and offer package manager commands
-            print("=== Linux Installation Options ===")
+            logger.info("=== Linux Installation Options ===")
             
             # Try to detect Linux distribution
             distro_info = ""
@@ -125,38 +134,38 @@ def ensure_ollama_installed():
                 distro_info = "Unknown Linux"
                 package_cmd = "curl -fsSL https://ollama.com/install.sh | sh"
             
-            print(f"Detected: {distro_info}")
-            print(f"Recommended command: {package_cmd}")
-            print()
-            print("1. Run the recommended installation command")
-            print("2. Manual installation from website")
-            print()
+            logger.info(f"Detected: {distro_info}")
+            logger.info(f"Recommended command: {package_cmd}")
+            logger.info()
+            logger.info("1. Run the recommended installation command")
+            logger.info("2. Manual installation from website")
+            logger.info()
             
             choice = input("Would you like to run the installation command? (y/n): ").lower().strip()
             
             if choice in ['y', 'yes', '1', '']:
-                print(f"Running: {package_cmd}")
-                print("Please enter your password if prompted...")
+                logger.info(f"Running: {package_cmd}")
+                logger.info("Please enter your password if prompted...")
                 try:
                     result = subprocess.run(package_cmd, shell=True, check=False)
                     if result.returncode == 0:
-                        print("Ollama installation completed!")
-                        print("Please restart this program to continue.")
+                        logger.info("Ollama installation completed!")
+                        logger.info("Please restart this program to continue.")
                     else:
-                        print("Installation failed or was cancelled.")
-                        print("You can try installing manually from https://ollama.com/")
+                        logger.warning("Installation failed or was cancelled.")
+                        logger.info("You can try installing manually from https://ollama.com/")
                 except Exception as e:
-                    print(f"Error running installation command: {e}")
-                    print("Please visit https://ollama.com/ for manual installation.")
+                    logger.error(f"Error running installation command: {e}")
+                    logger.info("Please visit https://ollama.com/ for manual installation.")
             else:
-                print("Opening Ollama website for manual installation...")
+                logger.info("Opening Ollama website for manual installation...")
                 webbrowser.open("https://ollama.com/")
         
         else:
             # Unsupported OS
-            print("=== Unsupported Operating System ===")
-            print("This tool currently supports Windows and Linux only.")
-            print("Please install Ollama manually from: https://ollama.com/")
+            logger.info("=== Unsupported Operating System ===")
+            logger.info("This tool currently supports Windows and Linux only.")
+            logger.info("Please install Ollama manually from: https://ollama.com/")
             webbrowser.open("https://ollama.com/")
         
         # Show final message
@@ -175,9 +184,9 @@ def ensure_ollama_installed():
     else:
         try:
             version = subprocess.check_output(["ollama", "--version"], text=True).strip()
-            print(f"Ollama found: {version}")
+            logger.info(f"Ollama found: {version}")
         except Exception as e:
-            print("Error checking Ollama:", e)
+            logger.error(f"Error checking Ollama: {e}")
             sys.exit("Please install Ollama and rerun this program.")
 
 def ensure_model_installed(model="qwen2.5vl:3b"):
@@ -185,13 +194,13 @@ def ensure_model_installed(model="qwen2.5vl:3b"):
     try:
         result = subprocess.run(["ollama", "list"], capture_output=True, text=True)
         if model not in result.stdout:
-            print(f"Model {model} not found. Pulling now...")
+            logger.info(f"Model {model} not found. Pulling now...")
             subprocess.run(["ollama", "pull", model], check=True)
-            print(f"Model {model} installed successfully.")
+            logger.info(f"Model {model} installed successfully.")
         else:
-            print(f"Model {model} already installed.")
+            logger.info(f"Model {model} already installed.")
     except Exception as e:
-        print("Error ensuring model:", e)
+        logger.error(f"Error ensuring model: {e}")
         sys.exit("Failed to ensure Ollama model.")
 
 
@@ -225,7 +234,7 @@ def load_config():
                 CAP_REGION = data.get("CAP_REGION", CAP_REGION)
                 label_color = data.get("label_color", label_color)
         except (json.JSONDecodeError, OSError) as e:
-            print(f"Config file invalid or empty, resetting: {e}")
+            logger.warning(f"Config file invalid or empty, resetting: {e}")
             save_config()
     else:
         save_config()
@@ -237,7 +246,7 @@ def save_config():
     data = {"CAP_REGION": CAP_REGION, "label_color": label_color}
     with open(CONFIG_FILE, "w") as f:
         json.dump(data, f, indent=4)
-    print("Config saved.")
+    logger.info("Config saved.")
 
 
 # ---------- Load Rock Types JSON ----------
@@ -331,7 +340,7 @@ def ocr_with_ollama(pil_img: Image.Image, model=OLLAMA_MODEL) -> str:
         )
         return response["message"]["content"].strip()
     except Exception as e:
-        print("Ollama OCR error:", e)
+        logger.error(f"Ollama OCR error: {e}")
         return ""
 
 
@@ -566,14 +575,14 @@ def capture_once():
 
     last_result = {"code": code, "code_raw": raw, "info": info, "raw_text": raw_text}
     update_overlay_label(info)
-    print("Scan result:", last_result)
+    logger.info(f"Scan result: {last_result}")
 
 
 def toggle_continuous():
     """Toggle continuous scanning mode."""
     global continuous_mode
     continuous_mode = not continuous_mode
-    print("Continuous mode:", continuous_mode)
+    logger.info(f"Continuous mode: {continuous_mode}")
     if continuous_mode:
         Thread(target=continuous_scan_loop, daemon=True).start()
 
@@ -607,11 +616,11 @@ def hotkey_listener():
         keyboard.add_hotkey("7", capture_once)
         keyboard.add_hotkey("ctrl+7", toggle_continuous)
         keyboard.add_hotkey("8", toggle_border)
-        print("Hotkeys registered: '7' for single scan, 'Ctrl+7' for continuous toggle, '8' for border toggle")
+        logger.info("Hotkeys registered: '7' for single scan, 'Ctrl+7' for continuous toggle, '8' for border toggle")
         keyboard.wait()
     except Exception as e:
-        print(f"Could not set up global hotkeys: {e}")
-        print("Note: Linux Support is being tested.")
+        logger.warning(f"Could not set up global hotkeys: {e}")
+        logger.info("Note: Linux Support is being tested.")
 
 
 # ---------- Main ----------
