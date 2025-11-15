@@ -11,7 +11,19 @@ from pathlib import Path
 from threading import Thread
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
-from PIL import Image, ImageDraw, ImageTk
+try:
+    from PIL import Image, ImageDraw, ImageTk
+except ModuleNotFoundError as exc:
+    missing_module = exc.name or "PIL"
+    print(
+        f"\n[Dependency Error]\n"
+        f"The required Python package '{missing_module}' is not installed.\n\n"
+        "Install the project dependencies before launching the tool:\n"
+        "    python -m pip install -r requirements.txt\n\n"
+        "If you are using the provided launch scripts, simply run them again "
+        "so they can install the missing packages automatically."
+    )
+    sys.exit(1)
 import cv2
 import numpy as np
 import mss
