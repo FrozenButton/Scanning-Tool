@@ -66,10 +66,33 @@ echo Checking Python version...
 for /f "tokens=2" %%i in ('"%PYTHON_EXE%" --version 2^>^&1') do set "CURRENT_VERSION=%%i"
 echo Found Python %CURRENT_VERSION%
 
+REM Ensure pip is available for the embedded Python runtime
+echo Ensuring pip is installed...
+"%PYTHON_EXE%" -m ensurepip --upgrade >nul 2>nul
+
 REM Check if virtual environment exists
 if not exist "%VENV_DIR%" (
     echo Creating virtual environment...
-    "%PYTHON_EXE%" -m venv "%VENV_DIR%"
+
+    REM Try to create a venv using the built-in module first
+    "%PYTHON_EXE%" -m venv "%VENV_DIR%" >nul 2>nul
+
+    if errorlevel 1 (
+        echo Built-in venv module is unavailable. Installing virtualenv package...
+        "%PYTHON_EXE%" -m pip install --upgrade pip
+        "%PYTHON_EXE%" -m pip install --upgrade virtualenv
+
+        echo Creating virtual environment with virtualenv...
+        "%PYTHON_EXE%" -m virtualenv "%VENV_DIR%"
+
+        if errorlevel 1 (
+            echo Error: Failed to create virtual environment.
+            echo Please delete the venv folder (if it exists) and re-run this script.
+            pause
+            exit /b 1
+        )
+    )
+
     echo Virtual environment created at: %VENV_DIR%
 ) else (
     echo Virtual environment already exists at: %VENV_DIR%
@@ -77,7 +100,14 @@ if not exist "%VENV_DIR%" (
 
 REM Activate virtual environment
 echo Activating virtual environment...
-call "%VENV_DIR%\Scripts\activate.bat"
+if exist "%VENV_DIR%\Scripts\activate.bat" (
+    call "%VENV_DIR%\Scripts\activate.bat"
+) else (
+    echo Error: Failed to find the virtual environment activation script.
+    echo Please delete the venv folder and re-run this script.
+    pause
+    exit /b 1
+)
 
 REM Upgrade pip
 echo Upgrading pip...
@@ -99,7 +129,7 @@ if exist "%REQ_MARKER%" (
 
 if !INSTALL_REQUIRED! == 1 (
     echo Installing Python requirements...
-    pip install -r "%SCRIPT_DIR%\requirements.txt"
+    python -m pip install -r "%SCRIPT_DIR%\requirements.txt"
     echo. > "%REQ_MARKER%"
     echo Requirements installed successfully
 ) else (
