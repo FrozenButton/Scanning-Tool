@@ -27,6 +27,10 @@ import webbrowser
 import logging
 import logging.handlers
 
+
+OVERLAY_PORT = 5000
+LOCAL_IPV4 = "127.0.0.1"
+
 # Configure logging to both console and file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -1852,6 +1856,10 @@ def launch_gui():
     ollama_host_var = tk.StringVar(value=CONFIGURED_OLLAMA_HOST)
     ollama_active_host_var = tk.StringVar()
 
+    local_network_ip = LOCAL_IPV4 or get_local_ip()
+    loopback_url = f"http://127.0.0.1:{OVERLAY_PORT}"
+    lan_url = f"http://{local_network_ip}:{OVERLAY_PORT}"
+
     def refresh_active_host_label() -> None:
         ollama_active_host_var.set(f"Active host: {get_ollama_host()}")
 
@@ -1876,6 +1884,18 @@ def launch_gui():
         status_var.set(message)
         logger.info(message)
 
+    def open_web_overlay() -> None:
+        try:
+            opened = webbrowser.open(loopback_url)
+        except Exception as exc:
+            status_var.set(f"Unable to open web overlay: {exc}")
+            logger.warning("Unable to open overlay browser window: %s", exc)
+        else:
+            if opened:
+                status_var.set("Opened web overlay in browser.")
+            else:
+                status_var.set("Attempted to open web overlay; please check your browser.")
+
     alignment_status_cache = {"message": None}
     anchor_status_hold = {"until": 0.0}
 
@@ -1888,6 +1908,42 @@ def launch_gui():
 
     main = ttk.Frame(root, style="Glass.Main.TFrame", padding=20)
     main.pack(fill="both", expand=True, padx=15, pady=15)
+
+    frm_web = ttk.LabelFrame(main, text="Web Overlay", style="Glass.TLabelframe")
+    frm_web.pack(fill="x", padx=5, pady=(0, 8))
+
+    btn_web_row = ttk.Frame(frm_web, style="Glass.Section.TFrame")
+    btn_web_row.pack(fill="x", padx=5, pady=(0, 5))
+    ttk.Button(
+        btn_web_row,
+        text="Open Web UI",
+        command=open_web_overlay,
+        style="Glass.TButton",
+    ).pack(side="left", padx=(0, 5))
+
+    ttk.Label(
+        frm_web,
+        text=f"This device: {loopback_url}",
+        anchor="w",
+        justify="left",
+        style="Glass.TLabel",
+    ).pack(fill="x", padx=5, pady=(0, 2))
+
+    ttk.Label(
+        frm_web,
+        text=f"Mobile / LAN: {lan_url}",
+        anchor="w",
+        justify="left",
+        style="Glass.TLabel",
+    ).pack(fill="x", padx=5, pady=(0, 2))
+
+    ttk.Label(
+        frm_web,
+        text="Share the LAN URL with mobile devices on the same network.",
+        anchor="w",
+        justify="left",
+        style="Glass.Small.TLabel",
+    ).pack(fill="x", padx=5, pady=(0, 5))
 
     frm_region = ttk.LabelFrame(main, text="Capture Region", style="Glass.TLabelframe")
     frm_region.pack(fill="x", padx=5, pady=8)
@@ -2282,9 +2338,13 @@ if __name__ == "__main__":
     anchor_tracker = AnchorRegionTracker(ANCHOR_TEMPLATE_DIR, ANCHOR_THRESHOLD)
     Thread(target=hotkey_listener, daemon=True).start()
     local_ip = get_local_ip()
+    LOCAL_IPV4 = local_ip
     logger.info(
-        "Starting overlay server: http://127.0.0.1:5000 (this device) | "
-        f"http://{local_ip}:5000 (local network)"
+        f"Starting overlay server: http://127.0.0.1:{OVERLAY_PORT} (this device) | "
+        f"http://{local_ip}:{OVERLAY_PORT} (local network)"
     )
-    Thread(target=lambda: app.run(host="0.0.0.0", port=5000, debug=False), daemon=True).start()
+    Thread(
+        target=lambda: app.run(host="0.0.0.0", port=OVERLAY_PORT, debug=False),
+        daemon=True,
+    ).start()
     launch_gui()
