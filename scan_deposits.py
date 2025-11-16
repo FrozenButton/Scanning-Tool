@@ -1906,8 +1906,43 @@ def launch_gui():
 
     refresh_active_host_label()
 
-    main = ttk.Frame(root, style="Glass.Main.TFrame", padding=20)
-    main.pack(fill="both", expand=True, padx=15, pady=15)
+    scroll_container = ttk.Frame(root, style="Glass.Main.TFrame")
+    scroll_container.pack(fill="both", expand=True, padx=15, pady=15)
+
+    canvas = tk.Canvas(
+        scroll_container,
+        background=colors["background"],
+        highlightthickness=0,
+        borderwidth=0,
+    )
+    canvas.pack(side="left", fill="both", expand=True)
+
+    v_scroll = ttk.Scrollbar(scroll_container, orient="vertical", command=canvas.yview)
+    v_scroll.pack(side="right", fill="y")
+    canvas.configure(yscrollcommand=v_scroll.set)
+
+    main = ttk.Frame(canvas, style="Glass.Main.TFrame", padding=20)
+    main_window = canvas.create_window((0, 0), window=main, anchor="nw")
+
+    def _update_scrollregion(_event) -> None:
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    def _resize_canvas(event) -> None:
+        canvas.itemconfigure(main_window, width=event.width)
+
+    def _on_mousewheel(event) -> None:
+        if event.delta:
+            canvas.yview_scroll(int(-event.delta / 120), "units")
+        elif getattr(event, "num", None) == 4:
+            canvas.yview_scroll(-1, "units")
+        elif getattr(event, "num", None) == 5:
+            canvas.yview_scroll(1, "units")
+
+    main.bind("<Configure>", _update_scrollregion)
+    canvas.bind("<Configure>", _resize_canvas)
+    root.bind_all("<MouseWheel>", _on_mousewheel)
+    root.bind_all("<Button-4>", _on_mousewheel)
+    root.bind_all("<Button-5>", _on_mousewheel)
 
     frm_web = ttk.LabelFrame(main, text="Web Overlay", style="Glass.TLabelframe")
     frm_web.pack(fill="x", padx=5, pady=(0, 8))
