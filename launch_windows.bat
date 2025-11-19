@@ -69,7 +69,17 @@ echo Found Python %CURRENT_VERSION%
 REM Check if virtual environment exists
 if not exist "%VENV_DIR%" (
     echo Creating virtual environment...
-    "%PYTHON_EXE%" -m venv "%VENV_DIR%"
+    echo Ensuring virtualenv package is available...
+    "%PYTHON_EXE%" -m pip show virtualenv >nul 2>nul
+    if errorlevel 1 (
+        "%PYTHON_EXE%" -m pip install --upgrade virtualenv
+    )
+    "%PYTHON_EXE%" -m virtualenv "%VENV_DIR%"
+    if errorlevel 1 (
+        echo Failed to create virtual environment. Please make sure the portable Python installation is intact.
+        pause
+        exit /b 1
+    )
     echo Virtual environment created at: %VENV_DIR%
 ) else (
     echo Virtual environment already exists at: %VENV_DIR%
