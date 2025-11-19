@@ -526,6 +526,7 @@ DEBUG_SHOW_OVERLAY = True
 OLLAMA_MODEL = "qwen2.5vl:3b"   # vision model
 DEFAULT_OLLAMA_HOST = "http://127.0.0.1:11434"
 CONFIGURED_OLLAMA_HOST = ""
+CONFIGURED_OLLAMA_GPU = ""
 
 _OLLAMA_CLIENT = None
 _OLLAMA_CLIENT_HOST = ""
@@ -592,6 +593,77 @@ def get_ollama_host() -> str:
     return DEFAULT_OLLAMA_HOST
 
 
+def set_configured_ollama_gpu(device_id: str) -> str:
+    """Persist the selected GPU identifier and update environment for launches."""
+
+    global CONFIGURED_OLLAMA_GPU
+    normalized = device_id.strip()
+    if normalized != CONFIGURED_OLLAMA_GPU:
+        CONFIGURED_OLLAMA_GPU = normalized
+        if normalized:
+            os.environ["CUDA_VISIBLE_DEVICES"] = normalized
+        else:
+            os.environ.pop("CUDA_VISIBLE_DEVICES", None)
+    return normalized
+
+
+def get_ollama_launch_env() -> Dict[str, str]:
+    """Return an environment mapping that respects GPU selection for Ollama."""
+
+    env = os.environ.copy()
+    if CONFIGURED_OLLAMA_GPU:
+        env["CUDA_VISIBLE_DEVICES"] = CONFIGURED_OLLAMA_GPU
+    return env
+
+
+def detect_gpu_devices() -> List[Tuple[str, str]]:
+    """Detect available GPUs using common platform utilities."""
+
+    devices: List[Tuple[str, str]] = []
+
+    if shutil.which("nvidia-smi"):
+        try:
+            output = subprocess.check_output(
+                ["nvidia-smi", "--query-gpu=index,name", "--format=csv,noheader"],
+                text=True,
+                stderr=subprocess.DEVNULL,
+            )
+            for line in output.splitlines():
+                if not line.strip():
+                    continue
+                idx, name = [part.strip() for part in line.split(",", 1)]
+                devices.append((idx, f"NVIDIA {name}"))
+        except (subprocess.SubprocessError, OSError):
+            logger.debug("Failed to query GPUs via nvidia-smi", exc_info=True)
+
+    if not devices and os.name == "nt" and shutil.which("wmic"):
+        try:
+            output = subprocess.check_output(
+                ["wmic", "path", "win32_VideoController", "get", "Name"],
+                text=True,
+                stderr=subprocess.DEVNULL,
+            )
+            for idx, line in enumerate(line for line in output.splitlines() if line.strip() and "Name" not in line):
+                devices.append((str(idx), line.strip()))
+        except (subprocess.SubprocessError, OSError):
+            logger.debug("Failed to query GPUs via wmic", exc_info=True)
+
+    if not devices and shutil.which("lspci"):
+        try:
+            output = subprocess.check_output(
+                ["lspci", "-nn"], text=True, stderr=subprocess.DEVNULL
+            )
+            gpu_lines = [line for line in output.splitlines() if re.search(r"VGA|3D|Display", line, re.IGNORECASE)]
+            for idx, line in enumerate(gpu_lines):
+                parts = line.split(":", 2)
+                name = parts[-1].strip() if parts else line.strip()
+                devices.append((str(idx), name))
+        except (subprocess.SubprocessError, OSError):
+            logger.debug("Failed to query GPUs via lspci", exc_info=True)
+
+    return devices
+
+
 def _normalize_for_parse(host: str) -> str:
     return host if "://" in host else f"http://{host}"
 
@@ -651,6 +723,7 @@ def start_local_ollama_service(host: str, wait_seconds: float = 10.0) -> bool:
     try:
         _OLLAMA_SERVER_PROCESS = subprocess.Popen(
             ["ollama", "serve"],
+            env=get_ollama_launch_env(),
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             stdin=subprocess.DEVNULL,
@@ -672,6 +745,44 @@ def start_local_ollama_service(host: str, wait_seconds: float = 10.0) -> bool:
 
     logger.warning("Timed out waiting for Ollama service to start. Please start it manually.")
     return False
+
+
+def stop_local_ollama_service(timeout: float = 5.0) -> bool:
+    """Terminate a locally launched Ollama server if this tool started it."""
+
+    global _OLLAMA_SERVER_PROCESS
+
+    if _OLLAMA_SERVER_PROCESS and _OLLAMA_SERVER_PROCESS.poll() is None:
+        logger.info("Stopping local Ollama service...")
+        _OLLAMA_SERVER_PROCESS.terminate()
+        try:
+            _OLLAMA_SERVER_PROCESS.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            _OLLAMA_SERVER_PROCESS.kill()
+        finally:
+            _OLLAMA_SERVER_PROCESS = None
+        return True
+
+    _OLLAMA_SERVER_PROCESS = None
+    return False
+
+
+def restart_local_ollama_service(host: str) -> bool:
+    """Restart the local Ollama daemon to apply updated GPU settings."""
+
+    if not is_local_ollama_host(host):
+        logger.info("Skipping Ollama restart because host %s is remote.", host)
+        return False
+
+    stopped = stop_local_ollama_service()
+
+    if is_ollama_running(host) and not stopped:
+        logger.info(
+            "Ollama appears to be running outside the tool; please restart it manually to apply GPU changes."
+        )
+        return False
+
+    return start_local_ollama_service(host)
 
 # Regex for codes
 CODE_RE = re.compile(
@@ -937,7 +1048,7 @@ anchor_tracker: Optional[AnchorRegionTracker] = None
 
 def load_config():
     global CAP_REGION, label_color, AUTO_ALIGN_ENABLED, ANCHOR_REGION, ANCHOR_OFFSET, ANCHOR_THRESHOLD, ANCHOR_TEMPLATE_DIR
-    global ALIGNMENT_POLL_INTERVAL_MS, CONTINUOUS_CAPTURE_INTERVAL, INFO_OVERLAY_OFFSET, CONFIGURED_OLLAMA_HOST
+    global ALIGNMENT_POLL_INTERVAL_MS, CONTINUOUS_CAPTURE_INTERVAL, INFO_OVERLAY_OFFSET, CONFIGURED_OLLAMA_HOST, CONFIGURED_OLLAMA_GPU
     if os.path.exists(CONFIG_FILE):
         try:
             with open(CONFIG_FILE, "r") as f:
@@ -958,6 +1069,9 @@ def load_config():
                     if CONFIGURED_OLLAMA_HOST:
                         os.environ["OLLAMA_HOST"] = CONFIGURED_OLLAMA_HOST
                     reset_ollama_client()
+                configured_gpu = data.get("OLLAMA_GPU", CONFIGURED_OLLAMA_GPU)
+                if configured_gpu != CONFIGURED_OLLAMA_GPU:
+                    set_configured_ollama_gpu(configured_gpu)
         except (json.JSONDecodeError, OSError) as e:
             logger.warning(f"Config file invalid or empty, resetting: {e}")
             save_config()
@@ -971,7 +1085,7 @@ def load_config():
 
 def save_config():
     global CAP_REGION, label_color, AUTO_ALIGN_ENABLED, ANCHOR_REGION, ANCHOR_OFFSET, ANCHOR_THRESHOLD, ANCHOR_TEMPLATE_DIR
-    global ALIGNMENT_POLL_INTERVAL_MS, CONTINUOUS_CAPTURE_INTERVAL, INFO_OVERLAY_OFFSET, CONFIGURED_OLLAMA_HOST
+    global ALIGNMENT_POLL_INTERVAL_MS, CONTINUOUS_CAPTURE_INTERVAL, INFO_OVERLAY_OFFSET, CONFIGURED_OLLAMA_HOST, CONFIGURED_OLLAMA_GPU
     data = {
         "CAP_REGION": CAP_REGION,
         "label_color": label_color,
@@ -984,6 +1098,7 @@ def save_config():
         "CONTINUOUS_CAPTURE_INTERVAL": CONTINUOUS_CAPTURE_INTERVAL,
         "INFO_OVERLAY_OFFSET": INFO_OVERLAY_OFFSET,
         "OLLAMA_HOST": CONFIGURED_OLLAMA_HOST,
+        "OLLAMA_GPU": CONFIGURED_OLLAMA_GPU,
     }
     with open(CONFIG_FILE, "w") as f:
         json.dump(data, f, indent=4)
@@ -1929,9 +2044,56 @@ def launch_gui():
     anchor_status_var = tk.StringVar(value="Head sway compensation ready.")
     ollama_host_var = tk.StringVar(value=CONFIGURED_OLLAMA_HOST)
     ollama_active_host_var = tk.StringVar()
+    gpu_choice_var = tk.StringVar()
+    gpu_status_var = tk.StringVar()
+    gpu_devices: List[Tuple[str, str]] = []
 
     def refresh_active_host_label() -> None:
         ollama_active_host_var.set(f"Active host: {get_ollama_host()}")
+
+    def describe_gpu_choice(device_id: str) -> str:
+        for dev_id, name in gpu_devices:
+            if dev_id == device_id:
+                return f"{dev_id}: {name}"
+        return "Auto (system default)" if not device_id else device_id
+
+    def refresh_gpu_list() -> None:
+        gpu_devices.clear()
+        gpu_devices.extend(detect_gpu_devices())
+        options = ["Auto (system default)"] + [f"{dev_id}: {name}" for dev_id, name in gpu_devices]
+        gpu_combo["values"] = options
+        current_display = describe_gpu_choice(CONFIGURED_OLLAMA_GPU)
+        if current_display not in options:
+            current_display = "Auto (system default)"
+        gpu_choice_var.set(current_display)
+        if gpu_devices:
+            gpu_status_var.set(f"Detected {len(gpu_devices)} GPU(s). Select one to pin Ollama.")
+        else:
+            gpu_status_var.set("No dedicated GPUs detected. The system default will be used.")
+
+    def apply_gpu_selection() -> None:
+        selected_label = gpu_choice_var.get()
+        selected_gpu = ""
+        if selected_label and not selected_label.startswith("Auto"):
+            selected_gpu = selected_label.split(":", 1)[0].strip()
+
+        normalized = set_configured_ollama_gpu(selected_gpu)
+        save_config()
+        description = describe_gpu_choice(normalized)
+        host = get_ollama_host()
+        if is_local_ollama_host(host):
+            status_var.set(f"Restarting Ollama on {host} with GPU: {description}...")
+            if restart_local_ollama_service(host):
+                status_var.set(f"Ollama running on {host} using GPU: {description}")
+            else:
+                status_var.set(
+                    "Unable to restart Ollama automatically. Please restart it manually to use the new GPU."
+                )
+        else:
+            status_var.set(
+                "GPU preference saved for local sessions. Remote Ollama host unchanged."
+            )
+        gpu_status_var.set(f"Active GPU: {description}")
 
     def apply_ollama_host_from_ui() -> None:
         sanitized = set_configured_ollama_host(ollama_host_var.get())
@@ -2207,6 +2369,43 @@ def launch_gui():
         style="Glass.Small.TLabel",
         justify="left",
     ).pack(fill="x", padx=5, pady=(0, 5))
+
+    frm_gpu = ttk.LabelFrame(main, text="GPU Selection", style="Glass.TLabelframe")
+    frm_gpu.pack(fill="x", padx=5, pady=8)
+    ttk.Label(
+        frm_gpu,
+        text="Pick which GPU Ollama should prefer when running locally.",
+        style="Glass.Small.TLabel",
+        wraplength=360,
+        justify="left",
+    ).pack(fill="x", padx=5, pady=(5, 2))
+
+    gpu_combo = ttk.Combobox(frm_gpu, textvariable=gpu_choice_var, state="readonly")
+    gpu_combo.pack(fill="x", padx=5, pady=(0, 5))
+
+    gpu_button_row = ttk.Frame(frm_gpu, style="Glass.Section.TFrame")
+    gpu_button_row.pack(fill="x", padx=5, pady=(0, 5))
+    ttk.Button(
+        gpu_button_row,
+        text="Refresh GPUs",
+        command=refresh_gpu_list,
+        style="Glass.TButton",
+    ).pack(side="left", padx=5)
+    ttk.Button(
+        gpu_button_row,
+        text="Apply GPU & Restart",
+        command=apply_gpu_selection,
+        style="Glass.TButton",
+    ).pack(side="left", padx=5)
+
+    ttk.Label(
+        frm_gpu,
+        textvariable=gpu_status_var,
+        style="Glass.Small.TLabel",
+        justify="left",
+    ).pack(fill="x", padx=5, pady=(0, 5))
+
+    refresh_gpu_list()
 
     anchor_btn_row = ttk.Frame(frm_anchor, style="Glass.Section.TFrame")
     anchor_btn_row.pack(fill="x", padx=5, pady=5)
