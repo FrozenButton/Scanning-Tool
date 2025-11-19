@@ -51,14 +51,33 @@ if not exist "%PYTHON_EXE%" (
         REM Remove the comment from import site line
         powershell -Command "(Get-Content '%PYTHON_DIR%\python313._pth') -replace '^#import site', 'import site' | Set-Content '%PYTHON_DIR%\python313._pth'"
     )
-    
+
     REM Install pip manually for embedded Python
     echo Installing pip...
     "%PYTHON_EXE%" -m ensurepip --default-pip
-    
+
     echo Portable Python installation completed!
 ) else (
     echo Portable Python found at: %PYTHON_EXE%
+)
+
+REM Ensure the embedded Python stays configured for pip even if it already existed
+set "HAS_IMPORT_SITE="
+if exist "%PYTHON_DIR%\python313._pth" (
+    for /f "usebackq tokens=*" %%i in (`findstr /b /c:"import site" "%PYTHON_DIR%\python313._pth"`) do set "HAS_IMPORT_SITE=1"
+    if not defined HAS_IMPORT_SITE (
+        echo Updating python313._pth to enable site packages...
+        powershell -Command "(Get-Content '%PYTHON_DIR%\python313._pth') -replace '^#import site', 'import site' | Set-Content '%PYTHON_DIR%\python313._pth'"
+    )
+)
+
+echo Ensuring pip is available in the embedded Python...
+"%PYTHON_EXE%" -m ensurepip --default-pip >nul 2>nul
+if errorlevel 1 (
+    echo Failed to initialize pip in the embedded Python installation.
+    echo Please delete the 'python' directory and rerun this script to reinstall Python.
+    pause
+    exit /b 1
 )
 
 REM Check Python version
@@ -69,7 +88,17 @@ echo Found Python %CURRENT_VERSION%
 REM Check if virtual environment exists
 if not exist "%VENV_DIR%" (
     echo Creating virtual environment...
-    "%PYTHON_EXE%" -m venv "%VENV_DIR%"
+    echo Ensuring virtualenv package is available...
+    "%PYTHON_EXE%" -m pip show virtualenv >nul 2>nul
+    if errorlevel 1 (
+        "%PYTHON_EXE%" -m pip install --upgrade virtualenv
+    )
+    "%PYTHON_EXE%" -m virtualenv "%VENV_DIR%"
+    if errorlevel 1 (
+        echo Failed to create virtual environment. Please make sure the portable Python installation is intact.
+        pause
+        exit /b 1
+    )
     echo Virtual environment created at: %VENV_DIR%
 ) else (
     echo Virtual environment already exists at: %VENV_DIR%

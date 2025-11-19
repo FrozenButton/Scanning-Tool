@@ -64,12 +64,22 @@ Since this tool runs alongside Star Citizen, you'll need:
 ### For Windows Users (Most People)
 
 1. **Download this tool** from GitHub (see Download section above)
-2. **Extract the ZIP file** to any folder on your computer  
+2. **Extract the ZIP file** to any folder on your computer
 3. **Double-click** the file called `launch_windows.bat`
 4. **Wait** - The tool will automatically download everything it needs (this might take a few minutes the first time)
 5. **That's it!** The scanner will open and be ready to use
 
 > ⚠️ **First time setup takes 2-5 minutes** while it downloads Python and other components. After that, it starts instantly!
+
+### Windows standalone EXE (no Python required for end users)
+
+If you want to ship a single folder that works on Windows PCs **without requiring Python to be installed**, build the bundled EXE and share the resulting `dist/` directory:
+
+1. On a Windows machine, open **Command Prompt** in the repository root.
+2. Run `build_windows_exe.bat`.
+   - The script downloads a portable Python 3.13.7, bootstraps `pip`, installs **PyInstaller** plus app requirements, and then creates the EXE.
+3. After the build finishes, the packaged app lives at `dist/StarCitizenScanningTool/StarCitizenScanningTool.exe`.
+4. Zip the entire `dist/StarCitizenScanningTool` folder and distribute it—recipients can run the EXE directly without setting up Python.
 
 ### For Linux Users
 
