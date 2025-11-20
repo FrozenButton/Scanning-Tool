@@ -50,7 +50,7 @@ def test_file_structure():
     required_files = [
         'scan_deposits.py',
         'requirements.txt',
-        'RockTypes_2025-09-16.json',
+        'RockType.json',
         'config.json'  # This might not exist initially, that's OK
     ]
     
