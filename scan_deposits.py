@@ -998,7 +998,7 @@ def resource_path(relative_path):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.abspath("."), relative_path)
 
-rock_file = resource_path("RockTypes_2025-09-16.json")
+rock_file = resource_path("RockType.json")
 with open(rock_file, "r") as f:
     ROCK_DATA = json.load(f)
 
@@ -1061,8 +1061,8 @@ def build_deposit_tables(rock_data):
     return deposit_tables
 
 DEPOSIT_TABLES = {
-    "STANTON": build_deposit_tables(ROCK_DATA.get("STANTON", {})),
-    "PYRO": build_deposit_tables(ROCK_DATA.get("PYRO", {}))
+    region_name.upper(): build_deposit_tables(region_data)
+    for region_name, region_data in ROCK_DATA.items()
 }
 
 # ---------- OCR with Ollama ----------
