@@ -7,7 +7,9 @@
 [![GitHub issues](https://img.shields.io/github/issues/FrozenButton/Scanning-Tool)](https://github.com/FrozenButton/Scanning-Tool/issues)
 
 ## What it does
-- Captures the HUD deposit code, reads it with the `qwen2.5vl:3b` model, and shows the deposit type/quantity.
+- Captures the HUD deposit code, reads it with the `qwen3-vl:2b` model, and shows the deposit type/quantity.
+
+**Note:** The scanner now uses the `qwen3-vl:2b` model, which offers better OCR accuracy, faster processing, and lower VRAM usage compared to the previous `qwen2.5vl:3b` model. This upgrade is specifically beneficial for reading Star Citizen HUD codes in real-time, even on systems with limited GPU resources.
 - Locks to a user-selected HUD anchor so the capture box follows head sway and ship movement.
 - Hosts a small web overlay (desktop + mobile friendly) so you can view the latest scan from a browser; a GUI button opens it for you.
 

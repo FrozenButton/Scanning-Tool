@@ -466,7 +466,7 @@ def ensure_ollama_running() -> None:
 
     sys.exit("Unable to reach a local Ollama service. Please start 'ollama serve' and rerun.")
 
-def ensure_model_installed(model="qwen2.5vl:3b"):
+def ensure_model_installed(model="qwen3-vl:2b"):
     """Ensure the Ollama model exists on the configured host."""
 
     host = get_ollama_host()
@@ -523,7 +523,7 @@ INFO_OVERLAY_OFFSET = {"x": 0, "y": 0}
 label_color = "yellow"
 MIN_CONFIDENCE = 0.65
 DEBUG_SHOW_OVERLAY = True
-OLLAMA_MODEL = "qwen2.5vl:3b"   # vision model
+OLLAMA_MODEL = "qwen3-vl:2b"   # vision model
 DEFAULT_OLLAMA_HOST = "http://127.0.0.1:11434"
 CONFIGURED_OLLAMA_HOST = ""
 
@@ -2431,7 +2431,7 @@ if __name__ == "__main__":
     # Ensure Ollama + model before starting
     ensure_ollama_installed()
     ensure_ollama_running()
-    ensure_model_installed("qwen2.5vl:3b")
+    ensure_model_installed("qwen3-vl:2b")
 
     anchor_tracker = AnchorRegionTracker(ANCHOR_TEMPLATE_DIR, ANCHOR_THRESHOLD)
     Thread(target=hotkey_listener, daemon=True).start()
