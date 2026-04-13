@@ -1086,8 +1086,8 @@ def build_deposit_tables(rock_data):
     return deposit_tables
 
 DEPOSIT_TABLES = {
-    "STANTON": build_deposit_tables(ROCK_DATA.get("STANTON", {})),
-    "PYRO": build_deposit_tables(ROCK_DATA.get("PYRO", {}))
+    region_name.upper(): build_deposit_tables(region_data)
+    for region_name, region_data in ROCK_DATA.items()
 }
 
 # ---------- OCR with Ollama ----------
