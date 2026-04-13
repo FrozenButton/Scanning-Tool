@@ -55,6 +55,10 @@ file_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
+PROJECT_ROOT = Path(__file__).resolve().parent
+CONFIG_FILE = PROJECT_ROOT / "config.json"
+ROCK_TYPE_FILENAME = "RockType.json"
+ROCK_TYPE_FILE = PROJECT_ROOT / ROCK_TYPE_FILENAME
 
 ScaleWidget = Union[tk.Scale, ttk.Scale]
 
@@ -509,7 +513,7 @@ def ensure_model_installed(model="qwen3-vl:2b"):
 
 
 # ---------- CONFIG ----------
-CONFIG_FILE = "config.json"
+CONFIG_FILE = PROJECT_ROOT / "config.json"
 
 CAP_REGION = {"left": 1260, "top": 310, "width": 160, "height": 30}
 ANCHOR_REGION = {"left": 1100, "top": 240, "width": 320, "height": 140}
@@ -993,12 +997,12 @@ def save_config():
 # ---------- Load Rock Types JSON ----------
 
 def resource_path(relative_path):
-    """Get absolute path to resource, works for dev and for PyInstaller bundle."""
+    """Get absolute path to a resource, works for dev and for PyInstaller bundle."""
     if hasattr(sys, "_MEIPASS"):  # running inside PyInstaller bundle
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), relative_path)
+        return str(Path(sys._MEIPASS) / relative_path)
+    return str(PROJECT_ROOT / relative_path)
 
-rock_file = resource_path("RockTypes_2025-09-16.json")
+rock_file = ROCK_TYPE_FILE
 with open(rock_file, "r") as f:
     ROCK_DATA = json.load(f)
 
