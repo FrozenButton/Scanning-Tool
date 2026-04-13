@@ -19,8 +19,13 @@
 ## Quick start
 ### Windows (recommended)
 1) Download the latest release or clone this repo.
-2) Double-click `launch_windows.bat`.
+2) Double-click `launch_windows.bat` or run `cmd.exe /c launch_windows.bat` from Git Bash.
 3) Wait for the first-run downloads (Python + dependencies). The scanner will start and auto-launch Ollama with `ollama serve` if it is not already running.
+
+### Windows using Git Bash and uv
+1) Open a Git Bash shell in the repo folder.
+2) Run `./launch_windows.sh` (make it executable first with `chmod +x launch_windows.sh` if needed).
+3) The script uses `uv` to manage Python and install requirements.
 
 ### Linux
 1) Download/clone the repo and open a terminal in the folder.

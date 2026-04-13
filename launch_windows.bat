@@ -13,63 +13,91 @@ set "VENV_DIR=%SCRIPT_DIR%\venv"
 set "PYTHON_EXE=%PYTHON_DIR%\python.exe"
 set "PYTHON_VERSION=3.13.7"
 set "PYTHON_URL=https://www.python.org/ftp/python/3.13.7/python-3.13.7-embed-amd64.zip"
+set "PYTHON_CMD=%PYTHON_EXE%"
+set "PYTHON_ARGS="
+set "PYTHON_INVOKE=%PYTHON_CMD%"
+
+REM Prefer uv managed Python if available.
+where uv >nul 2>nul
+if not errorlevel 1 (
+    echo uv Python manager found. Using uv-managed Python.
+    set "PYTHON_CMD=uv"
+    set "PYTHON_ARGS=run python"
+    set "PYTHON_INVOKE=%PYTHON_CMD% %PYTHON_ARGS%"
+)
 
 echo Script directory: %SCRIPT_DIR%
 
-REM Check if portable Python exists
-if not exist "%PYTHON_EXE%" (
-    echo Portable Python not found. Installing Python %PYTHON_VERSION%...
-    
-    REM Create python directory
-    if not exist "%PYTHON_DIR%" mkdir "%PYTHON_DIR%"
-    
-    REM Download Python embedded distribution
-    echo Downloading Python %PYTHON_VERSION% embedded distribution...
-    echo This may take a few minutes depending on your internet connection...
-    
-    REM Use PowerShell to download (available on Windows 7+ by default)
-    powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%PYTHON_URL%' -OutFile '%SCRIPT_DIR%\python.zip'}"
-    
-    if not exist "%SCRIPT_DIR%\python.zip" (
-        echo Error: Failed to download Python. Please check your internet connection.
-        echo You can manually download Python from: %PYTHON_URL%
-        echo Extract it to: %PYTHON_DIR%
-        pause
-        exit /b 1
+if "%PYTHON_CMD%"=="%PYTHON_EXE%" (
+    REM Check if portable Python exists
+    if not exist "%PYTHON_EXE%" (
+        echo Portable Python not found. Installing Python %PYTHON_VERSION%...
+        
+        REM Create python directory
+        if not exist "%PYTHON_DIR%" mkdir "%PYTHON_DIR%"
+        
+        REM Download Python embedded distribution
+        echo Downloading Python %PYTHON_VERSION% embedded distribution...
+        echo This may take a few minutes depending on your internet connection...
+        
+        REM Use PowerShell to download (available on Windows 7+ by default)
+        powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%PYTHON_URL%' -OutFile '%SCRIPT_DIR%\python.zip'}"
+        
+        if not exist "%SCRIPT_DIR%\python.zip" (
+            echo Error: Failed to download Python. Please check your internet connection.
+            echo You can manually download Python from: %PYTHON_URL%
+            echo Extract it to: %PYTHON_DIR%
+            pause
+            exit /b 1
+        )
+        
+        REM Extract Python
+        echo Extracting Python...
+        powershell -Command "Expand-Archive -Path '%SCRIPT_DIR%\python.zip' -DestinationPath '%PYTHON_DIR%' -Force"
+        
+        REM Clean up zip file
+        del "%SCRIPT_DIR%\python.zip"
+        
+        REM Enable pip by modifying python313._pth
+        echo Configuring Python for pip support...
+        if exist "%PYTHON_DIR%\python313._pth" (
+            REM Remove the comment from import site line
+            powershell -Command "(Get-Content '%PYTHON_DIR%\python313._pth') -replace '^#import site', 'import site' | Set-Content '%PYTHON_DIR%\python313._pth'"
+        )
+        
+        REM Install pip manually for embedded Python
+        echo Installing pip...
+        "%PYTHON_EXE%" -m ensurepip --default-pip
+        
+        echo Portable Python installation completed!
+    ) else (
+        echo Portable Python found at: %PYTHON_EXE%
     )
-    
-    REM Extract Python
-    echo Extracting Python...
-    powershell -Command "Expand-Archive -Path '%SCRIPT_DIR%\python.zip' -DestinationPath '%PYTHON_DIR%' -Force"
-    
-    REM Clean up zip file
-    del "%SCRIPT_DIR%\python.zip"
-    
-    REM Enable pip by modifying python313._pth
-    echo Configuring Python for pip support...
-    if exist "%PYTHON_DIR%\python313._pth" (
-        REM Remove the comment from import site line
-        powershell -Command "(Get-Content '%PYTHON_DIR%\python313._pth') -replace '^#import site', 'import site' | Set-Content '%PYTHON_DIR%\python313._pth'"
-    )
-    
-    REM Install pip manually for embedded Python
-    echo Installing pip...
-    "%PYTHON_EXE%" -m ensurepip --default-pip
-    
-    echo Portable Python installation completed!
 ) else (
-    echo Portable Python found at: %PYTHON_EXE%
+    echo Using uv-managed Python. Skipping portable Python setup.
 )
 
 REM Check Python version
 echo Checking Python version...
-for /f "tokens=2" %%i in ('"%PYTHON_EXE%" --version 2^>^&1') do set "CURRENT_VERSION=%%i"
+for /f "tokens=2" %%i in ('%PYTHON_INVOKE% --version 2^>^&1') do set "CURRENT_VERSION=%%i"
 echo Found Python %CURRENT_VERSION%
+
+if "%PYTHON_CMD%"=="uv" (
+    echo Launching with uv-managed Python and requirements.
+    echo Launching Star Citizen Scanning Tool...
+    echo Press Ctrl+C to stop the application
+    echo.
+
+    cd /d "%SCRIPT_DIR%"
+    uv run --no-project --managed-python --with-requirements "%SCRIPT_DIR%\requirements.txt" -- python "%SCRIPT_DIR%\scan_deposits.py"
+    set "EXIT_CODE=%ERRORLEVEL%"
+    goto AFTER_LAUNCH
+)
 
 REM Check if virtual environment exists
 if not exist "%VENV_DIR%" (
     echo Creating virtual environment...
-    "%PYTHON_EXE%" -m venv "%VENV_DIR%"
+    call %PYTHON_INVOKE% -m venv "%VENV_DIR%"
     echo Virtual environment created at: %VENV_DIR%
 ) else (
     echo Virtual environment already exists at: %VENV_DIR%
@@ -125,6 +153,7 @@ cd /d "%SCRIPT_DIR%"
 python scan_deposits.py
 set "EXIT_CODE=%ERRORLEVEL%"
 
+:AFTER_LAUNCH
 echo.
 echo Application closed.
 
