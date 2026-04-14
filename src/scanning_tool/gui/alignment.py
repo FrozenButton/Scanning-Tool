@@ -5,7 +5,7 @@ from typing import Optional
 
 from scanning_tool.anchor import perform_auto_alignment
 from scanning_tool.gui.status import StatusBar
-from scanning_tool.state import app_state
+from scanning_tool.state_context import app_state
 
 
 _IDLE_ALIGNMENT_INFO = {
@@ -36,14 +36,14 @@ class AlignmentPoller:
             self.status.push_alignment_message(message)
 
         try:
-            interval = max(100, int(app_state.alignment_poll_interval_ms))
+            interval = max(100, int(app_state.settings.anchor.alignment_poll_interval_ms))
             self.root.after(interval, self._tick)
         except tk.TclError:
             pass
 
     def _poll(self) -> Optional[str]:
-        if not app_state.auto_align_enabled:
-            info = app_state.last_alignment_info
+        if not app_state.settings.anchor.auto_align_enabled:
+            info = app_state.scan_state.last_alignment_info
             info.matched = False
             info.template = None
             info.score = 0.0
@@ -53,9 +53,9 @@ class AlignmentPoller:
             info.capture_top = None
             return "Head sway compensation disabled."
 
-        tracker = app_state.anchor_tracker
+        tracker = app_state.scan_state.anchor_tracker
         if tracker is None or not getattr(tracker, "templates", None):
-            info = app_state.last_alignment_info
+            info = app_state.scan_state.last_alignment_info
             info.matched = False
             info.template = None
             info.score = 0.0
@@ -66,9 +66,9 @@ class AlignmentPoller:
             return "Add anchor templates to enable head sway compensation."
 
         match_found = perform_auto_alignment()
-        info = app_state.last_alignment_info
+        info = app_state.scan_state.last_alignment_info
         if info.matched:
-            capture_msg = f"Auto alignment adjusted CAP_REGION: {app_state.cap_region}"
+            capture_msg = f"Auto alignment adjusted CAP_REGION: {app_state.settings.capture.cap_region}"
             if self.status.status_var.get() != capture_msg:
                 self.status.set_status(capture_msg)
             return f"Anchor locked using {info.template} (score {info.score:.2f})."

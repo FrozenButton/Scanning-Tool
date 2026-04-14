@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 
 import ollama
 
-from scanning_tool.state import app_state
+from scanning_tool.state_context import app_state
 from scanning_tool.config import save_config
 
 logger = logging.getLogger("scanning_tool")
@@ -24,22 +24,22 @@ def sanitize_ollama_host(value: str) -> str:
     host = (value or "").strip()
     if not host:
         return ""
-    if not app_state.host_scheme_re.match(host):
+    if not app_state.service_state.host_scheme_re.match(host):
         host = f"http://{host}"
     return host
 
 
 def reset_ollama_client() -> None:
     """Clear the cached Ollama client so the next call uses the latest host."""
-    app_state.ollama_client = None
-    app_state.ollama_client_host = ""
+    app_state.service_state.ollama_client = None
+    app_state.service_state.ollama_client_host = ""
 
 
 def set_configured_ollama_host(value: str) -> str:
     """Update the configured Ollama host and refresh environment/client state."""
     sanitized = sanitize_ollama_host(value)
-    if sanitized != app_state.configured_ollama_host:
-        app_state.configured_ollama_host = sanitized
+    if sanitized != app_state.settings.ollama.configured_ollama_host:
+        app_state.settings.ollama.configured_ollama_host = sanitized
         if sanitized:
             os.environ["OLLAMA_HOST"] = sanitized
         else:
@@ -52,12 +52,12 @@ def set_configured_ollama_model(value: str) -> str:
     """Update the configured Ollama model and persist it to the config."""
     sanitized = (value or "").strip()
     if sanitized:
-        if sanitized != app_state.ollama_model:
-            app_state.ollama_model = sanitized
+        if sanitized != app_state.settings.ollama.ollama_model:
+            app_state.settings.ollama.ollama_model = sanitized
             os.environ["OLLAMA_MODEL"] = sanitized
             save_config()
     else:
-        app_state.ollama_model = ""
+        app_state.settings.ollama.ollama_model = ""
         os.environ.pop("OLLAMA_MODEL", None)
         save_config()
     return sanitized
@@ -66,10 +66,10 @@ def set_configured_ollama_model(value: str) -> str:
 def get_ollama_client() -> ollama.Client:
     """Return an Ollama client instance configured for the active host."""
     host = get_ollama_host()
-    if app_state.ollama_client is None or app_state.ollama_client_host != host:
-        app_state.ollama_client = ollama.Client(host=host)
-        app_state.ollama_client_host = host
-    return app_state.ollama_client
+    if app_state.service_state.ollama_client is None or app_state.service_state.ollama_client_host != host:
+        app_state.service_state.ollama_client = ollama.Client(host=host)
+        app_state.service_state.ollama_client_host = host
+    return app_state.service_state.ollama_client
 
 
 def get_ollama_host() -> str:
@@ -77,15 +77,15 @@ def get_ollama_host() -> str:
     env_host = os.getenv("OLLAMA_HOST", "").strip()
     if env_host:
         return sanitize_ollama_host(env_host)
-    if app_state.configured_ollama_host:
-        return app_state.configured_ollama_host
-    return app_state.default_ollama_host
+    if app_state.settings.ollama.configured_ollama_host:
+        return app_state.settings.ollama.configured_ollama_host
+    return app_state.settings.ollama.default_ollama_host
 
 
 def get_ollama_model() -> str:
     """Return the active Ollama model, preferring environment config over the saved fallback."""
     env_model = os.getenv("OLLAMA_MODEL", "").strip()
-    return env_model or app_state.ollama_model
+    return env_model or app_state.settings.ollama.ollama_model
 
 
 def _normalize_for_parse(host: str) -> str:
@@ -130,12 +130,12 @@ def start_local_ollama_service(host: str, wait_seconds: float = 10.0) -> bool:
         logger.warning("Cannot start Ollama automatically because it is not installed.")
         return False
 
-    if app_state.ollama_server_process and app_state.ollama_server_process.poll() is None:
+    if app_state.service_state.ollama_server_process and app_state.service_state.ollama_server_process.poll() is None:
         return True
 
     logger.info("Starting local Ollama service with 'ollama serve'...")
     try:
-        app_state.ollama_server_process = subprocess.Popen(
+        app_state.service_state.ollama_server_process = subprocess.Popen(
             ["ollama", "serve"],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
@@ -151,7 +151,7 @@ def start_local_ollama_service(host: str, wait_seconds: float = 10.0) -> bool:
         if is_ollama_running(host):
             logger.info("Ollama service is now running.")
             return True
-        if app_state.ollama_server_process.poll() is not None:
+        if app_state.service_state.ollama_server_process.poll() is not None:
             logger.error("'ollama serve' exited before the service became ready.")
             return False
         time.sleep(0.5)

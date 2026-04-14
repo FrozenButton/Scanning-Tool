@@ -12,7 +12,7 @@ from scanning_tool.gui.overlays import (
     update_overlay_region,
 )
 from scanning_tool.scanning import capture_once, toggle_continuous
-from scanning_tool.state import app_state
+from scanning_tool.state_context import app_state
 
 
 class ControlsSection:
@@ -30,7 +30,7 @@ class ControlsSection:
             interval_row, text="Continuous capture interval (s)", style="Glass.Small.TLabel"
         ).pack(side="left")
 
-        self._interval_var = tk.DoubleVar(value=float(app_state.continuous_capture_interval))
+        self._interval_var = tk.DoubleVar(value=float(app_state.settings.capture.continuous_capture_interval))
         spinbox = tk.Spinbox(
             interval_row, from_=0.2, to=30.0, increment=0.1,
             textvariable=self._interval_var, width=6, format="%.1f",
@@ -63,7 +63,7 @@ class ControlsSection:
         except (tk.TclError, ValueError):
             return
         value = max(0.2, min(30.0, value))
-        app_state.continuous_capture_interval = value
+        app_state.settings.capture.continuous_capture_interval = value
         self._status.set_status(
-            f"Continuous capture interval set to {app_state.continuous_capture_interval:.1f}s"
+            f"Continuous capture interval set to {app_state.settings.capture.continuous_capture_interval:.1f}s"
         )

@@ -4,14 +4,15 @@ import logging
 import tkinter as tk
 from typing import Dict
 
-from scanning_tool.state import ScaleWidget, app_state
+from scanning_tool.gui.control_state import ScaleWidget
+from scanning_tool.state_context import app_state
 from .base import safe_tk
 
 logger = logging.getLogger("scanning_tool")
 
 
 def register_capture_sliders(left: ScaleWidget, top: ScaleWidget, width: ScaleWidget, height: ScaleWidget) -> None:
-    app_state.gui_control_state["capture"].update({
+    app_state.control_state.gui_control_state["capture"].update({
         "left": left, "top": top, "width": width, "height": height,
     })
 
@@ -24,7 +25,7 @@ def register_anchor_sliders(
     offset_x: ScaleWidget,
     offset_y: ScaleWidget,
 ) -> None:
-    app_state.gui_control_state["anchor"].update({
+    app_state.control_state.gui_control_state["anchor"].update({
         "left": left,
         "top": top,
         "width": width,
@@ -35,15 +36,17 @@ def register_anchor_sliders(
 
 
 def register_overlay_sliders(offset_x: ScaleWidget, offset_y: ScaleWidget) -> None:
-    app_state.gui_control_state["overlay"].update({"offset_x": offset_x, "offset_y": offset_y})
+    app_state.control_state.gui_control_state["overlay"].update({"offset_x": offset_x, "offset_y": offset_y})
 
 
 def sync_capture_sliders() -> None:
-    state = app_state.gui_control_state
+    state = app_state.control_state.gui_control_state
     widgets = state["capture"]
     widget = widgets["left"]
     if not widget or state["syncing"]["capture"]:
         return
+
+    capture_region = app_state.settings.capture.cap_region
 
     def _apply() -> None:
         if state["syncing"]["capture"]:
@@ -51,10 +54,10 @@ def sync_capture_sliders() -> None:
         state["syncing"]["capture"] = True
         try:
             try:
-                widgets["left"].set(int(app_state.cap_region["left"]))
-                widgets["top"].set(int(app_state.cap_region["top"]))
-                widgets["width"].set(int(app_state.cap_region["width"]))
-                widgets["height"].set(int(app_state.cap_region["height"]))
+                widgets["left"].set(int(capture_region["left"]))
+                widgets["top"].set(int(capture_region["top"]))
+                widgets["width"].set(int(capture_region["width"]))
+                widgets["height"].set(int(capture_region["height"]))
             except tk.TclError:
                 pass
         finally:
@@ -64,11 +67,14 @@ def sync_capture_sliders() -> None:
 
 
 def sync_anchor_sliders() -> None:
-    state = app_state.gui_control_state
+    state = app_state.control_state.gui_control_state
     widgets = state["anchor"]
     widget = widgets["left"]
     if not widget or state["syncing"]["anchor"]:
         return
+
+    anchor_region = app_state.settings.anchor.anchor_region
+    anchor_offset = app_state.settings.anchor.anchor_offset
 
     def _apply() -> None:
         if state["syncing"]["anchor"]:
@@ -76,12 +82,12 @@ def sync_anchor_sliders() -> None:
         state["syncing"]["anchor"] = True
         try:
             try:
-                widgets["left"].set(int(app_state.anchor_region["left"]))
-                widgets["top"].set(int(app_state.anchor_region["top"]))
-                widgets["width"].set(int(app_state.anchor_region["width"]))
-                widgets["height"].set(int(app_state.anchor_region["height"]))
-                widgets["offset_x"].set(int(app_state.anchor_offset["x"]))
-                widgets["offset_y"].set(int(app_state.anchor_offset["y"]))
+                widgets["left"].set(int(anchor_region["left"]))
+                widgets["top"].set(int(anchor_region["top"]))
+                widgets["width"].set(int(anchor_region["width"]))
+                widgets["height"].set(int(anchor_region["height"]))
+                widgets["offset_x"].set(int(anchor_offset["x"]))
+                widgets["offset_y"].set(int(anchor_offset["y"]))
             except tk.TclError:
                 pass
         finally:
@@ -91,11 +97,13 @@ def sync_anchor_sliders() -> None:
 
 
 def sync_overlay_sliders() -> None:
-    state = app_state.gui_control_state
+    state = app_state.control_state.gui_control_state
     widgets = state["overlay"]
     widget = widgets["offset_x"]
     if not widget or state["syncing"]["overlay"]:
         return
+
+    overlay_offset = app_state.settings.overlay.info_overlay_offset
 
     def _apply() -> None:
         if state["syncing"]["overlay"]:
@@ -103,8 +111,8 @@ def sync_overlay_sliders() -> None:
         state["syncing"]["overlay"] = True
         try:
             try:
-                widgets["offset_x"].set(int(app_state.info_overlay_offset.get("x", 0)))
-                widgets["offset_y"].set(int(app_state.info_overlay_offset.get("y", 0)))
+                widgets["offset_x"].set(int(overlay_offset.get("x", 0)))
+                widgets["offset_y"].set(int(overlay_offset.get("y", 0)))
             except tk.TclError:
                 pass
         finally:

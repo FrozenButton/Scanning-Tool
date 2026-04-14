@@ -6,7 +6,7 @@ from threading import Thread
 from scanning_tool.logging_setup import setup_logging
 from scanning_tool.config import load_config
 from scanning_tool.deposits import load_rock_data
-from scanning_tool.state import app_state
+from scanning_tool.state_context import app_state
 from scanning_tool.anchor import AnchorRegionTracker
 from scanning_tool.ollama_service import (
     ensure_ollama_installed,
@@ -31,8 +31,9 @@ def main() -> None:
     ensure_model_installed()
     log_model_running_status()
 
-    app_state.anchor_tracker = AnchorRegionTracker(
-        app_state.anchor_template_dir, app_state.anchor_threshold
+    app_state.scan_state.anchor_tracker = AnchorRegionTracker(
+        app_state.settings.anchor.anchor_template_dir,
+        app_state.settings.anchor.anchor_threshold,
     )
 
     Thread(target=hotkey_listener, daemon=True).start()

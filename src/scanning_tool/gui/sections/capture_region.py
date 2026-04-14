@@ -1,4 +1,4 @@
-"""Capture Region section — 4 sliders controlling the OCR capture rectangle."""
+"""Capture Region section — 4 sliders controlling the OCR capture rectangle via AppContext capture settings."""
 
 from tkinter import ttk
 
@@ -9,7 +9,7 @@ from scanning_tool.gui.overlays import (
     sync_capture_sliders,
     update_capture_overlay_region,
 )
-from scanning_tool.state import app_state
+from scanning_tool.state_context import app_state
 
 
 class CaptureRegionSection:
@@ -21,21 +21,23 @@ class CaptureRegionSection:
 
         self._status = ctx.status
 
+        cap_region = app_state.settings.capture.cap_region
+
         self._left = create_glass_scale(
             frame, text="Left", minimum=0, maximum=3000,
-            initial=app_state.cap_region["left"], command=self._on_change,
+            initial=cap_region["left"], command=self._on_change,
         )
         self._top = create_glass_scale(
             frame, text="Top", minimum=0, maximum=2000,
-            initial=app_state.cap_region["top"], command=self._on_change,
+            initial=cap_region["top"], command=self._on_change,
         )
         self._width = create_glass_scale(
             frame, text="Width", minimum=50, maximum=1000,
-            initial=app_state.cap_region["width"], command=self._on_change,
+            initial=cap_region["width"], command=self._on_change,
         )
         self._height = create_glass_scale(
             frame, text="Height", minimum=20, maximum=500,
-            initial=app_state.cap_region["height"], command=self._on_change,
+            initial=cap_region["height"], command=self._on_change,
             padding=(0, 0),
         )
 
@@ -44,11 +46,12 @@ class CaptureRegionSection:
         return frame
 
     def _on_change(self, *_args: object) -> None:
-        if app_state.gui_control_state["syncing"]["capture"]:
+        if app_state.control_state.gui_control_state["syncing"]["capture"]:
             return
-        app_state.cap_region["left"] = int(self._left.get())
-        app_state.cap_region["top"] = int(self._top.get())
-        app_state.cap_region["width"] = int(self._width.get())
-        app_state.cap_region["height"] = int(self._height.get())
-        self._status.set_status(f"CAP_REGION updated: {app_state.cap_region}")
+        cap_region = app_state.settings.capture.cap_region
+        cap_region["left"] = int(self._left.get())
+        cap_region["top"] = int(self._top.get())
+        cap_region["width"] = int(self._width.get())
+        cap_region["height"] = int(self._height.get())
+        self._status.set_status(f"CAP_REGION updated: {cap_region}")
         update_capture_overlay_region()

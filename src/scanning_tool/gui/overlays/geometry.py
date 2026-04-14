@@ -11,10 +11,12 @@ from .base import (
     MIN_INFO_OVERLAY_WIDTH,
     SCREEN_MARGIN,
 )
-from scanning_tool.state import app_state
+from scanning_tool.state_context import app_state
 
 
 def compute_info_overlay_geometry(screen_width: int, screen_height: int) -> Tuple[int, int, int, int]:
+    overlay_settings = app_state.settings.overlay
+
     overlay_width = max(
         MIN_INFO_OVERLAY_WIDTH,
         min(MAX_INFO_OVERLAY_WIDTH, screen_width - SCREEN_MARGIN),
@@ -23,8 +25,8 @@ def compute_info_overlay_geometry(screen_width: int, screen_height: int) -> Tupl
     base_left = max(0, (screen_width - overlay_width) // 2)
     base_top = max(0, int(screen_height * 0.35) - overlay_height // 2)
 
-    offset_x = int(app_state.info_overlay_offset.get("x", 0))
-    offset_y = int(app_state.info_overlay_offset.get("y", 0))
+    offset_x = int(overlay_settings.info_overlay_offset.get("x", 0))
+    offset_y = int(overlay_settings.info_overlay_offset.get("y", 0))
 
     max_left = max(0, screen_width - overlay_width)
     max_top = max(0, screen_height - overlay_height)
@@ -35,13 +37,14 @@ def compute_info_overlay_geometry(screen_width: int, screen_height: int) -> Tupl
 
 
 def compute_capture_overlay_layout() -> Dict[str, int]:
-    cap_w = int(app_state.cap_region["width"])
-    cap_h = int(app_state.cap_region["height"])
+    cap_region = app_state.settings.capture.cap_region
+    cap_w = int(cap_region["width"])
+    cap_h = int(cap_region["height"])
 
     overlay_width = cap_w + CAPTURE_OVERLAY_PADDING_X
     overlay_height = cap_h + CAPTURE_OVERLAY_PADDING_Y
-    left = int(app_state.cap_region["left"]) - (CAPTURE_OVERLAY_PADDING_X // 2)
-    top = int(app_state.cap_region["top"]) - CAPTURE_OVERLAY_PADDING_Y
+    left = int(cap_region["left"]) - (CAPTURE_OVERLAY_PADDING_X // 2)
+    top = int(cap_region["top"]) - CAPTURE_OVERLAY_PADDING_Y
 
     return {
         "overlay_width": overlay_width,
@@ -56,10 +59,11 @@ def compute_capture_overlay_layout() -> Dict[str, int]:
 
 
 def compute_anchor_overlay_geometry() -> Dict[str, int]:
-    width = int(app_state.anchor_region["width"]) + ANCHOR_OVERLAY_PAD
-    height = int(app_state.anchor_region["height"]) + ANCHOR_OVERLAY_PAD
-    left = int(app_state.anchor_region["left"]) - (ANCHOR_OVERLAY_PAD // 2)
-    top = int(app_state.anchor_region["top"]) - (ANCHOR_OVERLAY_PAD // 2)
+    anchor_region = app_state.settings.anchor.anchor_region
+    width = int(anchor_region["width"]) + ANCHOR_OVERLAY_PAD
+    height = int(anchor_region["height"]) + ANCHOR_OVERLAY_PAD
+    left = int(anchor_region["left"]) - (ANCHOR_OVERLAY_PAD // 2)
+    top = int(anchor_region["top"]) - (ANCHOR_OVERLAY_PAD // 2)
 
     return {
         "width": width,

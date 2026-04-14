@@ -24,7 +24,7 @@ from .slider_sync import (
     sync_capture_sliders,
     sync_overlay_sliders,
 )
-from scanning_tool.state import app_state
+from scanning_tool.state_context import app_state
 
 __all__ = [
     "choose_label_color",
@@ -58,9 +58,10 @@ def show_overlay(screen_width: Optional[int] = None, screen_height: Optional[int
     show_capture_overlay()
 
     if screen_width is None or screen_height is None:
-        if app_state.capture_overlay_root and safe_tk(app_state.capture_overlay_root.winfo_exists, False):
-            screen_width = safe_tk(app_state.capture_overlay_root.winfo_screenwidth, 1920) or 1920
-            screen_height = safe_tk(app_state.capture_overlay_root.winfo_screenheight, 1080) or 1080
+        overlay_state = app_state.overlay_state
+        if overlay_state.capture_overlay_root and safe_tk(overlay_state.capture_overlay_root.winfo_exists, False):
+            screen_width = safe_tk(overlay_state.capture_overlay_root.winfo_screenwidth, 1920) or 1920
+            screen_height = safe_tk(overlay_state.capture_overlay_root.winfo_screenheight, 1080) or 1080
 
     if screen_width is not None and screen_height is not None:
         show_info_overlay(screen_width, screen_height)

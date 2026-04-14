@@ -1,4 +1,4 @@
-"""Result Display section — offset sliders for the on-screen info overlay."""
+"""Result Display section — offset sliders for the on-screen info overlay via AppContext overlay settings."""
 
 from tkinter import ttk
 
@@ -9,7 +9,7 @@ from scanning_tool.gui.overlays import (
     reposition_info_overlay,
     sync_overlay_sliders,
 )
-from scanning_tool.state import app_state
+from scanning_tool.state_context import app_state
 
 
 class ResultDisplaySection:
@@ -21,14 +21,16 @@ class ResultDisplaySection:
 
         self._status = ctx.status
 
+        overlay_offset = app_state.settings.overlay.info_overlay_offset
+
         self._offset_x = create_glass_scale(
             frame, text="Display offset X", minimum=-800, maximum=800,
-            initial=int(app_state.info_overlay_offset.get("x", 0)),
+            initial=int(overlay_offset.get("x", 0)),
             command=self._on_change,
         )
         self._offset_y = create_glass_scale(
             frame, text="Display offset Y", minimum=-600, maximum=600,
-            initial=int(app_state.info_overlay_offset.get("y", 0)),
+            initial=int(overlay_offset.get("y", 0)),
             command=self._on_change,
             padding=(0, 0),
         )
@@ -38,12 +40,13 @@ class ResultDisplaySection:
         return frame
 
     def _on_change(self, *_args: object) -> None:
-        if app_state.gui_control_state["syncing"].get("overlay"):
+        if app_state.control_state.gui_control_state["syncing"].get("overlay"):
             return
-        app_state.info_overlay_offset["x"] = int(self._offset_x.get())
-        app_state.info_overlay_offset["y"] = int(self._offset_y.get())
+        overlay_offset = app_state.settings.overlay.info_overlay_offset
+        overlay_offset["x"] = int(self._offset_x.get())
+        overlay_offset["y"] = int(self._offset_y.get())
         self._status.set_status(
-            f"Display offset updated: x={app_state.info_overlay_offset['x']}, "
-            f"y={app_state.info_overlay_offset['y']}"
+            f"Display offset updated: x={overlay_offset['x']}, "
+            f"y={overlay_offset['y']}"
         )
         reposition_info_overlay()

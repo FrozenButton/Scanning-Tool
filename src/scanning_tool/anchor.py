@@ -8,7 +8,7 @@ import cv2
 import mss
 import numpy as np
 
-from scanning_tool.state import app_state
+from scanning_tool.state_context import app_state
 from scanning_tool.config import ensure_anchor_directory
 
 logger = logging.getLogger("scanning_tool")
@@ -124,20 +124,25 @@ def perform_auto_alignment() -> bool:
     """Attempt to adjust the capture region based on anchor template matches."""
     from scanning_tool.gui.overlays import sync_capture_sliders, update_capture_overlay_region
 
-    app_state.last_alignment_info.enabled = app_state.auto_align_enabled
+    scan_state = app_state.scan_state
+    anchor_settings = app_state.settings.anchor
+    capture_settings = app_state.settings.capture
+    overlay_state = app_state.overlay_state
 
-    if not app_state.auto_align_enabled:
+    scan_state.last_alignment_info.enabled = anchor_settings.auto_align_enabled
+
+    if not anchor_settings.auto_align_enabled:
         return False
 
-    if app_state.anchor_tracker is None:
+    if scan_state.anchor_tracker is None:
         logger.debug("Anchor tracker not initialised; skipping auto alignment.")
         return False
 
-    app_state.anchor_tracker.set_threshold(float(app_state.anchor_threshold))
-    detection = app_state.anchor_tracker.locate_anchor(app_state.anchor_region)
+    scan_state.anchor_tracker.set_threshold(float(anchor_settings.anchor_threshold))
+    detection = scan_state.anchor_tracker.locate_anchor(anchor_settings.anchor_region)
 
     if not detection:
-        info = app_state.last_alignment_info
+        info = scan_state.last_alignment_info
         info.matched = False
         info.template = None
         info.score = 0.0
@@ -147,32 +152,32 @@ def perform_auto_alignment() -> bool:
         info.capture_top = None
         return False
 
-    template_w = detection.get("template_width", float(app_state.cap_region["width"]))
-    template_h = detection.get("template_height", float(app_state.cap_region["height"]))
-    base_left = detection["match_left"] + (template_w / 2.0) - (app_state.cap_region["width"] / 2.0)
-    base_top = detection["match_top"] + (template_h / 2.0) - (app_state.cap_region["height"] / 2.0)
+    template_w = detection.get("template_width", float(capture_settings.cap_region["width"]))
+    template_h = detection.get("template_height", float(capture_settings.cap_region["height"]))
+    base_left = detection["match_left"] + (template_w / 2.0) - (capture_settings.cap_region["width"] / 2.0)
+    base_top = detection["match_top"] + (template_h / 2.0) - (capture_settings.cap_region["height"] / 2.0)
 
-    new_left = int(round(base_left + app_state.anchor_offset.get("x", 0)))
-    new_top = int(round(base_top + app_state.anchor_offset.get("y", 0)))
+    new_left = int(round(base_left + anchor_settings.anchor_offset.get("x", 0)))
+    new_top = int(round(base_top + anchor_settings.anchor_offset.get("y", 0)))
 
-    app_state.cap_region["left"] = max(0, new_left)
-    app_state.cap_region["top"] = max(0, new_top)
+    capture_settings.cap_region["left"] = max(0, new_left)
+    capture_settings.cap_region["top"] = max(0, new_top)
 
-    info = app_state.last_alignment_info
+    info = scan_state.last_alignment_info
     info.matched = True
     info.template = detection["template"]
     info.score = float(detection["score"])
     info.match_left = detection["match_left"]
     info.match_top = detection["match_top"]
-    info.capture_left = app_state.cap_region["left"]
-    info.capture_top = app_state.cap_region["top"]
+    info.capture_left = capture_settings.cap_region["left"]
+    info.capture_top = capture_settings.cap_region["top"]
 
     sync_capture_sliders()
 
-    if app_state.capture_overlay_root:
+    if overlay_state.capture_overlay_root:
         try:
             import tkinter as tk
-            app_state.capture_overlay_root.after(0, update_capture_overlay_region)
+            overlay_state.capture_overlay_root.after(0, update_capture_overlay_region)
         except (RuntimeError, Exception):
             update_capture_overlay_region()
 
@@ -180,7 +185,7 @@ def perform_auto_alignment() -> bool:
         "Auto alignment applied using %s (score %.3f) => CAP_REGION left/top updated to (%d, %d)",
         detection["template"],
         detection["score"],
-        app_state.cap_region["left"],
-        app_state.cap_region["top"],
+        capture_settings.cap_region["left"],
+        capture_settings.cap_region["top"],
     )
     return True

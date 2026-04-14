@@ -4,7 +4,7 @@ import tkinter as tk
 
 from scanning_tool.config import save_config
 from scanning_tool.gui.overlays import stop_capture_overlay_animation
-from scanning_tool.state import app_state
+from scanning_tool.state_context import app_state
 
 
 def register_close_handler(root: tk.Tk) -> None:
@@ -13,26 +13,27 @@ def register_close_handler(root: tk.Tk) -> None:
     def on_close() -> None:
         stop_capture_overlay_animation()
         save_config()
+        overlay_state = app_state.overlay_state
         try:
             for window in (
-                app_state.capture_overlay_root,
-                app_state.anchor_overlay_root,
-                app_state.info_overlay_root,
+                overlay_state.capture_overlay_root,
+                overlay_state.anchor_overlay_root,
+                overlay_state.info_overlay_root,
             ):
                 if window and window.winfo_exists():
                     window.destroy()
         except Exception:
             pass
 
-        app_state.capture_overlay_root = None
-        app_state.capture_overlay_canvas = None
-        app_state.capture_rect_id = None
-        app_state.anchor_overlay_root = None
-        app_state.anchor_overlay_canvas = None
-        app_state.anchor_rect_id = None
-        app_state.info_overlay_root = None
-        app_state.info_overlay_canvas = None
-        app_state.info_text_id = None
+        overlay_state.capture_overlay_root = None
+        overlay_state.capture_overlay_canvas = None
+        overlay_state.capture_rect_id = None
+        overlay_state.anchor_overlay_root = None
+        overlay_state.anchor_overlay_canvas = None
+        overlay_state.anchor_rect_id = None
+        overlay_state.info_overlay_root = None
+        overlay_state.info_overlay_canvas = None
+        overlay_state.info_text_id = None
 
         root.destroy()
 
