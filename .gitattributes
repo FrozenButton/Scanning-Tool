@@ -1,0 +1,37 @@
+# Default: treat as text and enforce LF on checkout for everyone
+* text=auto eol=lf
+
+# Python and web source
+*.py   text eol=lf
+*.pyi  text eol=lf
+*.toml text eol=lf
+*.cfg  text eol=lf
+*.ini  text eol=lf
+*.json text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.md   text eol=lf
+*.txt  text eol=lf
+*.csv  text eol=lf
+*.html text eol=lf
+*.css  text eol=lf
+*.js   text eol=lf
+
+# Shell scripts — always LF, even on Windows
+*.sh text eol=lf
+
+# Windows batch files — require CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets — never munge
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.zip  binary
+*.exe  binary
+*.dll  binary
+*.pyd  binary
