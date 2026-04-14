@@ -4,8 +4,11 @@ import json
 import logging
 import os
 import sys
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from typing import Any, Dict
 
+from scanning_tool.config.settings import AppSettings
 from scanning_tool.state.context import AppContext
 
 logger = logging.getLogger(__name__)
@@ -14,6 +17,68 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 CONFIG_FILE = PROJECT_ROOT / "config.json"
 ROCK_TYPE_FILENAME = "RockType.json"
 ROCK_TYPE_FILE = PROJECT_ROOT / ROCK_TYPE_FILENAME
+
+
+@dataclass
+class ConfigData:
+    CAP_REGION: Dict[str, int] = field(default_factory=lambda: {
+        "left": 1260,
+        "top": 310,
+        "width": 160,
+        "height": 30,
+    })
+    label_color: str = "yellow"
+    AUTO_ALIGN_ENABLED: bool = True
+    ANCHOR_REGION: Dict[str, int] = field(default_factory=lambda: {
+        "left": 1100,
+        "top": 240,
+        "width": 320,
+        "height": 140,
+    })
+    ANCHOR_OFFSET: Dict[str, int] = field(default_factory=lambda: {"x": 36, "y": 56})
+    ANCHOR_THRESHOLD: float = 0.82
+    ANCHOR_TEMPLATE_DIR: str = "assets/anchor_templates"
+    ALIGNMENT_POLL_INTERVAL_MS: int = 500
+    CONTINUOUS_CAPTURE_INTERVAL: float = 2.0
+    INFO_OVERLAY_OFFSET: Dict[str, int] = field(default_factory=lambda: {"x": 0, "y": 0})
+    OLLAMA_HOST: str = ""
+    OLLAMA_MODEL: str = ""
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "ConfigData":
+        valid_items = {k: v for k, v in data.items() if k in cls.__annotations__}
+        return cls(**valid_items)
+
+    @classmethod
+    def from_settings(cls, settings: AppSettings) -> "ConfigData":
+        return cls(
+            CAP_REGION=settings.capture.cap_region,
+            label_color=settings.overlay.label_color,
+            AUTO_ALIGN_ENABLED=settings.anchor.auto_align_enabled,
+            ANCHOR_REGION=settings.anchor.anchor_region,
+            ANCHOR_OFFSET=settings.anchor.anchor_offset,
+            ANCHOR_THRESHOLD=settings.anchor.anchor_threshold,
+            ANCHOR_TEMPLATE_DIR=settings.anchor.anchor_template_dir,
+            ALIGNMENT_POLL_INTERVAL_MS=settings.anchor.alignment_poll_interval_ms,
+            CONTINUOUS_CAPTURE_INTERVAL=settings.capture.continuous_capture_interval,
+            INFO_OVERLAY_OFFSET=settings.overlay.info_overlay_offset,
+            OLLAMA_HOST=settings.ollama.configured_ollama_host,
+            OLLAMA_MODEL=settings.ollama.ollama_model,
+        )
+
+    def apply_to_settings(self, settings: AppSettings) -> None:
+        settings.capture.cap_region = self.CAP_REGION
+        settings.overlay.label_color = self.label_color
+        settings.anchor.auto_align_enabled = self.AUTO_ALIGN_ENABLED
+        settings.anchor.anchor_region = self.ANCHOR_REGION
+        settings.anchor.anchor_offset = self.ANCHOR_OFFSET
+        settings.anchor.anchor_threshold = self.ANCHOR_THRESHOLD
+        settings.anchor.anchor_template_dir = self.ANCHOR_TEMPLATE_DIR
+        settings.anchor.alignment_poll_interval_ms = self.ALIGNMENT_POLL_INTERVAL_MS
+        settings.capture.continuous_capture_interval = self.CONTINUOUS_CAPTURE_INTERVAL
+        settings.overlay.info_overlay_offset = self.INFO_OVERLAY_OFFSET
+        settings.ollama.configured_ollama_host = self.OLLAMA_HOST
+        settings.ollama.ollama_model = self.OLLAMA_MODEL
 
 
 def resource_path(relative_path: str) -> str:
@@ -35,86 +100,39 @@ def load_config(app_context: AppContext, config_file: Path = CONFIG_FILE) -> Non
     """Load configuration from a file into the provided app context."""
     from scanning_tool.ollama import reset_ollama_client, sanitize_ollama_host
 
+    config = ConfigData()
     if config_file.exists():
         try:
             with open(config_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
-
-            app_context.settings.capture.cap_region = data.get(
-                "CAP_REGION", app_context.settings.capture.cap_region
-            )
-            app_context.settings.overlay.label_color = data.get(
-                "label_color", app_context.settings.overlay.label_color
-            )
-            app_context.settings.anchor.auto_align_enabled = data.get(
-                "AUTO_ALIGN_ENABLED", app_context.settings.anchor.auto_align_enabled
-            )
-            app_context.settings.anchor.anchor_region = data.get(
-                "ANCHOR_REGION", app_context.settings.anchor.anchor_region
-            )
-            app_context.settings.anchor.anchor_offset = data.get(
-                "ANCHOR_OFFSET", app_context.settings.anchor.anchor_offset
-            )
-            app_context.settings.anchor.anchor_threshold = data.get(
-                "ANCHOR_THRESHOLD", app_context.settings.anchor.anchor_threshold
-            )
-            app_context.settings.anchor.anchor_template_dir = data.get(
-                "ANCHOR_TEMPLATE_DIR", app_context.settings.anchor.anchor_template_dir
-            )
-            app_context.settings.anchor.alignment_poll_interval_ms = data.get(
-                "ALIGNMENT_POLL_INTERVAL_MS", app_context.settings.anchor.alignment_poll_interval_ms
-            )
-            app_context.settings.capture.continuous_capture_interval = data.get(
-                "CONTINUOUS_CAPTURE_INTERVAL", app_context.settings.capture.continuous_capture_interval
-            )
-            app_context.settings.overlay.info_overlay_offset = data.get(
-                "INFO_OVERLAY_OFFSET", app_context.settings.overlay.info_overlay_offset
-            )
-
-            configured_host = sanitize_ollama_host(
-                data.get("OLLAMA_HOST", app_context.settings.ollama.configured_ollama_host)
-            )
-            configured_model = data.get("OLLAMA_MODEL", app_context.settings.ollama.ollama_model)
-
+            config = ConfigData.from_dict(data)
             env_model = os.getenv("OLLAMA_MODEL", "").strip()
             if env_model:
-                configured_model = env_model
+                config.OLLAMA_MODEL = env_model
 
-            if configured_model != app_context.settings.ollama.ollama_model:
-                app_context.settings.ollama.ollama_model = configured_model
-
+            configured_host = sanitize_ollama_host(config.OLLAMA_HOST)
             if configured_host != app_context.settings.ollama.configured_ollama_host:
                 app_context.settings.ollama.configured_ollama_host = configured_host
-                if app_context.settings.ollama.configured_ollama_host:
-                    os.environ["OLLAMA_HOST"] = app_context.settings.ollama.configured_ollama_host
+                if configured_host:
+                    os.environ["OLLAMA_HOST"] = configured_host
                 reset_ollama_client()
+
+            config.OLLAMA_HOST = configured_host
         except (json.JSONDecodeError, OSError) as exc:
             logger.warning(f"Config file invalid or empty, resetting: {exc}")
             save_config(app_context, config_file)
     else:
         save_config(app_context, config_file)
 
+    config.apply_to_settings(app_context.settings)
     ensure_anchor_directory(app_context.settings.anchor.anchor_template_dir)
     app_context.scan_state.last_alignment_info.enabled = app_context.settings.anchor.auto_align_enabled
 
 
 def save_config(app_context: AppContext, config_file: Path = CONFIG_FILE) -> None:
     """Persist the provided app context configuration to disk."""
-    data = {
-        "CAP_REGION": app_context.settings.capture.cap_region,
-        "label_color": app_context.settings.overlay.label_color,
-        "AUTO_ALIGN_ENABLED": app_context.settings.anchor.auto_align_enabled,
-        "ANCHOR_REGION": app_context.settings.anchor.anchor_region,
-        "ANCHOR_OFFSET": app_context.settings.anchor.anchor_offset,
-        "ANCHOR_THRESHOLD": app_context.settings.anchor.anchor_threshold,
-        "ANCHOR_TEMPLATE_DIR": app_context.settings.anchor.anchor_template_dir,
-        "ALIGNMENT_POLL_INTERVAL_MS": app_context.settings.anchor.alignment_poll_interval_ms,
-        "CONTINUOUS_CAPTURE_INTERVAL": app_context.settings.capture.continuous_capture_interval,
-        "INFO_OVERLAY_OFFSET": app_context.settings.overlay.info_overlay_offset,
-        "OLLAMA_HOST": app_context.settings.ollama.configured_ollama_host,
-        "OLLAMA_MODEL": app_context.settings.ollama.ollama_model,
-    }
+    config = ConfigData.from_settings(app_context.settings)
     with open(config_file, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4)
+        json.dump(asdict(config), f, indent=4)
         f.write("\n")
     logger.info("Config saved.")
