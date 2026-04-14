@@ -20,6 +20,9 @@ dependencies = [
 [project.scripts]
 scanning-tool = "scanning_tool.main:main"
 
+[project.optional-dependencies]
+tests = ["pytest"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/scanning_tool"]
 

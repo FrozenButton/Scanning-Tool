@@ -3,7 +3,8 @@
 import tkinter as tk
 from typing import Optional
 
-from scanning_tool.anchor import perform_auto_alignment
+from scanning_tool.core.auto_alignment import perform_auto_alignment
+from scanning_tool.gui.overlays import update_capture_overlay_region, sync_capture_sliders
 from scanning_tool.gui.overlays.base import safe_tk
 from scanning_tool.gui.status import StatusBar
 from scanning_tool.state_context import app_state
@@ -65,7 +66,14 @@ class AlignmentPoller:
             info.capture_top = None
             return "Add anchor templates to enable head sway compensation."
 
-        match_found = perform_auto_alignment()
+        match_found = perform_auto_alignment(
+            app_state.scan_state.anchor_tracker,
+            app_state.settings.anchor,
+            app_state.settings.capture,
+            app_state.scan_state.last_alignment_info,
+            sync_capture_sliders,
+            update_capture_overlay_region,
+        )
         info = app_state.scan_state.last_alignment_info
         if info.matched:
             capture_msg = f"Auto alignment adjusted CAP_REGION: {app_state.settings.capture.cap_region}"

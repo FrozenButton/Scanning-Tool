@@ -10,8 +10,8 @@ from PIL import Image
 from scanning_tool.state_context import app_state
 from scanning_tool.ocr import ocr_with_ollama
 from scanning_tool.deposits import extract_code_from_text, lookup_deposit
-from scanning_tool.anchor import perform_auto_alignment
-from scanning_tool.gui.overlays import update_overlay_label
+from scanning_tool.core.auto_alignment import perform_auto_alignment
+from scanning_tool.gui.overlays import update_capture_overlay_region, update_overlay_label, sync_capture_sliders
 from scanning_tool.runtime.scan_state import LastResult
 
 logger = logging.getLogger(__name__)
@@ -22,7 +22,14 @@ def capture_once() -> None:
     def _do_capture(status_callback=None):
         if status_callback:
             status_callback("Aligning region...")
-        auto_aligned = perform_auto_alignment()
+        auto_aligned = perform_auto_alignment(
+            app_state.scan_state.anchor_tracker,
+            app_state.settings.anchor,
+            app_state.settings.capture,
+            app_state.scan_state.last_alignment_info,
+            sync_capture_sliders,
+            update_capture_overlay_region,
+        )
         if app_state.settings.anchor.auto_align_enabled:
             logger.debug("Auto alignment %s before capture.", "succeeded" if auto_aligned else "did not match")
         cap_region = app_state.settings.capture.cap_region

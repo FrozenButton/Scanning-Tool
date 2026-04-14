@@ -1,24 +1,5 @@
-from dataclasses import dataclass
+"""Backward-compatible state shim used by legacy imports."""
 
-from .config.settings import AppSettings
-from .runtime.scan_state import ScanState
-from .runtime.service_state import ServiceState
-from .gui.overlay_state import OverlayState
-from .gui.control_state import ControlState
+from scanning_tool.state.context import app_state
 
-@dataclass
-class AppContext:
-    settings: AppSettings
-    scan_state: ScanState
-    overlay_state: OverlayState
-    control_state: ControlState
-    service_state: ServiceState
-
-# Temporary shim for migration
-app_state = AppContext(
-    settings=AppSettings(),
-    scan_state=ScanState(),
-    overlay_state=OverlayState(),
-    control_state=ControlState(),
-    service_state=ServiceState(),
-)
+__all__ = ["app_state"]

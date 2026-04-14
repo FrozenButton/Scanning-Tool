@@ -8,7 +8,8 @@ import sys
 import tkinter as tk
 from tkinter import ttk
 
-from scanning_tool.anchor import AnchorRegionTracker, perform_auto_alignment
+from scanning_tool.core.anchor import AnchorRegionTracker
+from scanning_tool.core.auto_alignment import perform_auto_alignment
 from scanning_tool.config import ensure_anchor_directory
 from scanning_tool.gui.sections.base import SectionContext
 from scanning_tool.gui.widgets import (
@@ -162,7 +163,7 @@ class HeadSwaySection:
             f"Anchor region updated: {anchor_region}", hold=2.0
         )
         if app_state.settings.anchor.auto_align_enabled:
-            perform_auto_alignment()
+            self._run_auto_alignment()
         update_anchor_overlay_region()
 
     def _on_offset_change(self, *_args: object) -> None:
@@ -175,16 +176,26 @@ class HeadSwaySection:
             f"Anchor offset updated: {anchor_offset}", hold=2.0
         )
         if app_state.settings.anchor.auto_align_enabled:
-            perform_auto_alignment()
+            self._run_auto_alignment()
 
     def _toggle_auto_align(self) -> None:
         app_state.settings.anchor.auto_align_enabled = self._auto_align_var.get()
         app_state.scan_state.last_alignment_info.enabled = app_state.settings.anchor.auto_align_enabled
         if app_state.settings.anchor.auto_align_enabled:
             self._status.set_anchor("Head sway compensation enabled.")
-            perform_auto_alignment()
+            self._run_auto_alignment()
         else:
             self._status.set_anchor("Head sway compensation disabled.")
+
+    def _run_auto_alignment(self) -> bool:
+        return perform_auto_alignment(
+            app_state.scan_state.anchor_tracker,
+            app_state.settings.anchor,
+            app_state.settings.capture,
+            app_state.scan_state.last_alignment_info,
+            sync_capture_sliders,
+            update_anchor_overlay_region,
+        )
 
     def _toggle_anchor_overlay_visibility(self) -> None:
         app_state.overlay_state.anchor_overlay_visible = self._anchor_overlay_var.get()
@@ -232,7 +243,7 @@ class HeadSwaySection:
         )
 
     def _manual_realign(self) -> None:
-        if perform_auto_alignment():
+        if self._run_auto_alignment():
             info = app_state.scan_state.last_alignment_info
             self._status.set_anchor(
                 f"Anchor locked using {info.template} (score {info.score:.2f}).",
