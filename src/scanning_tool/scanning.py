@@ -12,6 +12,7 @@ from scanning_tool.ocr import ocr_with_ollama
 from scanning_tool.deposits import extract_code_from_text, lookup_deposit
 from scanning_tool.anchor import perform_auto_alignment
 from scanning_tool.overlay import update_overlay_label
+from scanning_tool.runtime.scan_state import LastResult
 
 logger = logging.getLogger("scanning_tool")
 
@@ -40,7 +41,7 @@ def capture_once() -> None:
             raw_text = ocr_with_ollama(pil_img)
             code, raw = extract_code_from_text(raw_text)
             info = lookup_deposit(code)
-            app_state.last_result = {"code": code, "code_raw": raw, "info": info, "raw_text": raw_text}
+            app_state.last_result = LastResult(code=code, code_raw=raw, info=info, raw_text=raw_text)
             update_overlay_label(info, code=code, raw_text=raw or raw_text)
             logger.info(f"Scan result: {app_state.last_result}")
             if status_callback:

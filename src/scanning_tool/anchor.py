@@ -124,7 +124,7 @@ def perform_auto_alignment() -> bool:
     """Attempt to adjust the capture region based on anchor template matches."""
     from scanning_tool.overlay import sync_capture_sliders, update_capture_overlay_region
 
-    app_state.last_alignment_info["enabled"] = app_state.auto_align_enabled
+    app_state.last_alignment_info.enabled = app_state.auto_align_enabled
 
     if not app_state.auto_align_enabled:
         return False
@@ -137,15 +137,14 @@ def perform_auto_alignment() -> bool:
     detection = app_state.anchor_tracker.locate_anchor(app_state.anchor_region)
 
     if not detection:
-        app_state.last_alignment_info.update({
-            "matched": False,
-            "template": None,
-            "score": 0.0,
-            "match_left": None,
-            "match_top": None,
-            "capture_left": None,
-            "capture_top": None,
-        })
+        info = app_state.last_alignment_info
+        info.matched = False
+        info.template = None
+        info.score = 0.0
+        info.match_left = None
+        info.match_top = None
+        info.capture_left = None
+        info.capture_top = None
         return False
 
     template_w = detection.get("template_width", float(app_state.cap_region["width"]))
@@ -159,15 +158,14 @@ def perform_auto_alignment() -> bool:
     app_state.cap_region["left"] = max(0, new_left)
     app_state.cap_region["top"] = max(0, new_top)
 
-    app_state.last_alignment_info.update({
-        "matched": True,
-        "template": detection["template"],
-        "score": float(detection["score"]),
-        "match_left": detection["match_left"],
-        "match_top": detection["match_top"],
-        "capture_left": app_state.cap_region["left"],
-        "capture_top": app_state.cap_region["top"],
-    })
+    info = app_state.last_alignment_info
+    info.matched = True
+    info.template = detection["template"]
+    info.score = float(detection["score"])
+    info.match_left = detection["match_left"]
+    info.match_top = detection["match_top"]
+    info.capture_left = app_state.cap_region["left"]
+    info.capture_top = app_state.cap_region["top"]
 
     sync_capture_sliders()
 

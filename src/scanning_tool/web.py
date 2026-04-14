@@ -2,6 +2,7 @@
 
 import logging
 import socket
+from dataclasses import asdict
 
 from flask import Flask, jsonify, render_template, request
 
@@ -38,8 +39,8 @@ def create_app() -> Flask:
     def status():
         """Return the latest scan information for the overlay UI."""
         selected_region = request.args.get("region", "STANTON").upper()
-        result = app_state.last_result or {}
-        info = result.get("info") if isinstance(result, dict) else None
+        result = app_state.last_result
+        info = getattr(result, "info", None)
 
         table = None
         if info:
@@ -53,14 +54,14 @@ def create_app() -> Flask:
         response = {
             "region": app_state.cap_region,
             "label_color": app_state.label_color,
-            "last": app_state.last_result,
-            "alignment": app_state.last_alignment_info,
+            "last": asdict(result),
+            "alignment": asdict(app_state.last_alignment_info),
             "selected_region": selected_region,
             "info": info,
-            "code": result.get("code") if isinstance(result, dict) else None,
-            "code_raw": result.get("code_raw") if isinstance(result, dict) else None,
-            "confidence": float(result.get("confidence", 0.0)) if isinstance(result, dict) else 0.0,
-            "raw_text": result.get("raw_text") if isinstance(result, dict) else None,
+            "code": result.code,
+            "code_raw": result.code_raw,
+            "confidence": float(result.confidence),
+            "raw_text": result.raw_text,
             "table": table,
         }
 

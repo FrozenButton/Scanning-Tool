@@ -10,7 +10,7 @@ from scanning_tool.state import app_state
 
 logger = logging.getLogger("scanning_tool")
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 CONFIG_FILE = PROJECT_ROOT / "config.json"
 ROCK_TYPE_FILENAME = "RockType.json"
 ROCK_TYPE_FILE = PROJECT_ROOT / ROCK_TYPE_FILENAME
@@ -70,7 +70,7 @@ def load_config() -> None:
         save_config()
 
     ensure_anchor_directory(app_state.anchor_template_dir)
-    app_state.last_alignment_info["enabled"] = app_state.auto_align_enabled
+    app_state.last_alignment_info.enabled = app_state.auto_align_enabled
 
 
 def save_config() -> None:

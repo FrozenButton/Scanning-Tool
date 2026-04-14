@@ -43,21 +43,35 @@ class AlignmentPoller:
 
     def _poll(self) -> Optional[str]:
         if not app_state.auto_align_enabled:
-            app_state.last_alignment_info.update(_IDLE_ALIGNMENT_INFO)
+            info = app_state.last_alignment_info
+            info.matched = False
+            info.template = None
+            info.score = 0.0
+            info.match_left = None
+            info.match_top = None
+            info.capture_left = None
+            info.capture_top = None
             return "Head sway compensation disabled."
 
         tracker = app_state.anchor_tracker
         if tracker is None or not getattr(tracker, "templates", None):
-            app_state.last_alignment_info.update(_IDLE_ALIGNMENT_INFO)
+            info = app_state.last_alignment_info
+            info.matched = False
+            info.template = None
+            info.score = 0.0
+            info.match_left = None
+            info.match_top = None
+            info.capture_left = None
+            info.capture_top = None
             return "Add anchor templates to enable head sway compensation."
 
         match_found = perform_auto_alignment()
         info = app_state.last_alignment_info
-        if info.get("matched"):
+        if info.matched:
             capture_msg = f"Auto alignment adjusted CAP_REGION: {app_state.cap_region}"
             if self.status.status_var.get() != capture_msg:
                 self.status.set_status(capture_msg)
-            return f"Anchor locked using {info['template']} (score {info['score']:.2f})."
+            return f"Anchor locked using {info.template} (score {info.score:.2f})."
         if not match_found:
             return "Anchor match not found. Adjust search region or add templates."
         return None

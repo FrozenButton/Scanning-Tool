@@ -16,7 +16,7 @@ from scanning_tool.ollama_service import (
 )
 from scanning_tool.hotkeys import hotkey_listener
 from scanning_tool.web import create_app, get_local_ip
-from scanning_tool.gui import launch_gui
+from scanning_tool.gui.app import launch_gui
 
 
 def main() -> None:

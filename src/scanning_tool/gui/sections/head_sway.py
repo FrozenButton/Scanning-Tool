@@ -158,7 +158,7 @@ class HeadSwaySection:
 
     def _toggle_auto_align(self) -> None:
         app_state.auto_align_enabled = self._auto_align_var.get()
-        app_state.last_alignment_info["enabled"] = app_state.auto_align_enabled
+        app_state.last_alignment_info.enabled = app_state.auto_align_enabled
         if app_state.auto_align_enabled:
             self._status.set_anchor("Head sway compensation enabled.")
             perform_auto_alignment()
