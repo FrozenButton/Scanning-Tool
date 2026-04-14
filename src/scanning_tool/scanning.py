@@ -14,7 +14,7 @@ from scanning_tool.anchor import perform_auto_alignment
 from scanning_tool.gui.overlays import update_overlay_label
 from scanning_tool.runtime.scan_state import LastResult
 
-logger = logging.getLogger("scanning_tool")
+logger = logging.getLogger(__name__)
 
 
 def capture_once() -> None:

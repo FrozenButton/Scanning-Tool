@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional
 from scanning_tool.config import ROCK_TYPE_FILE
 from scanning_tool.state_context import app_state
 
-logger = logging.getLogger("scanning_tool")
+logger = logging.getLogger(__name__)
 
 
 # --- Dynamic scan signature table ---

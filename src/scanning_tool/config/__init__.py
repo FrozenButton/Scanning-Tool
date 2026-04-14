@@ -6,7 +6,7 @@ import os
 import sys
 from pathlib import Path
 
-logger = logging.getLogger("scanning_tool")
+logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 CONFIG_FILE = PROJECT_ROOT / "config.json"

@@ -10,7 +10,7 @@ from scanning_tool.state_context import app_state
 from scanning_tool.config import resource_path
 ## Removed import of MULTIPLIER_CODES (now replaced by dynamic scan signature data)
 
-logger = logging.getLogger("scanning_tool")
+logger = logging.getLogger(__name__)
 
 
 def get_local_ip() -> str:

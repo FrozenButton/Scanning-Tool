@@ -4,6 +4,7 @@ import tkinter as tk
 from typing import Optional
 
 from scanning_tool.anchor import perform_auto_alignment
+from scanning_tool.gui.overlays.base import safe_tk
 from scanning_tool.gui.status import StatusBar
 from scanning_tool.state_context import app_state
 
@@ -35,11 +36,10 @@ class AlignmentPoller:
         if message:
             self.status.push_alignment_message(message)
 
-        try:
-            interval = max(100, int(app_state.settings.anchor.alignment_poll_interval_ms))
-            self.root.after(interval, self._tick)
-        except tk.TclError:
-            pass
+        safe_tk(lambda: self.root.after(
+            max(100, int(app_state.settings.anchor.alignment_poll_interval_ms)),
+            self._tick,
+        ))
 
     def _poll(self) -> Optional[str]:
         if not app_state.settings.anchor.auto_align_enabled:

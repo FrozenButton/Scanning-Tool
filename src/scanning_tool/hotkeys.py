@@ -7,7 +7,7 @@ import keyboard
 from scanning_tool.scanning import capture_once, toggle_continuous
 from scanning_tool.gui.overlays import toggle_border
 
-logger = logging.getLogger("scanning_tool")
+logger = logging.getLogger(__name__)
 
 
 def hotkey_listener() -> None:

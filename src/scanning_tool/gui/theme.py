@@ -7,6 +7,8 @@ from tkinter import ttk
 
 from PIL import Image, ImageDraw, ImageTk
 
+from .overlays.base import safe_tk
+
 
 GlassPalette = Dict[str, str]
 
@@ -36,10 +38,7 @@ def apply_glass_theme(root: tk.Tk) -> GlassPalette:
     root.option_add("*Foreground", colors["text"])
     root.option_add("*TCombobox*Listbox*Background", colors["panel"])
     style = ttk.Style(root)
-    try:
-        style.theme_use("clam")
-    except tk.TclError:
-        pass
+    safe_tk(lambda: style.theme_use("clam"))
 
     style.configure("Glass.Main.TFrame", background=colors["background"])
     style.configure("Glass.Section.TFrame", background=colors["panel"])
@@ -51,15 +50,12 @@ def apply_glass_theme(root: tk.Tk) -> GlassPalette:
         relief="solid",
         padding=16,
     )
-    try:
-        style.configure(
-            "Glass.TLabelframe",
-            bordercolor=colors["border"],
-            lightcolor=colors["border"],
-            darkcolor=colors["background"],
-        )
-    except tk.TclError:
-        pass
+    safe_tk(lambda: style.configure(
+        "Glass.TLabelframe",
+        bordercolor=colors["border"],
+        lightcolor=colors["border"],
+        darkcolor=colors["background"],
+    ))
     style.configure(
         "Glass.TLabelframe.Label",
         background=colors["panel"],
@@ -115,16 +111,13 @@ def apply_glass_theme(root: tk.Tk) -> GlassPalette:
     slider_active = _make_slider_image(colors["knob_active"], colors["accent"])
     root._glass_slider_images = (slider_normal, slider_active)  # type: ignore[attr-defined]
 
-    try:
-        style.element_create(
-            "Glass.Horizontal.Scale.slider",
-            "image",
-            slider_normal,
-            ("active", slider_active),
-            ("pressed", slider_active),
-        )
-    except tk.TclError:
-        pass
+    safe_tk(lambda: style.element_create(
+        "Glass.Horizontal.Scale.slider",
+        "image",
+        slider_normal,
+        ("active", slider_active),
+        ("pressed", slider_active),
+    ))
 
     style.layout(
         "Glass.Horizontal.TScale",
@@ -164,15 +157,13 @@ def _make_slider_image(fill: str, outline: str) -> ImageTk.PhotoImage:
 
 def style_spinbox(spinbox: tk.Spinbox, colors: GlassPalette) -> None:
     """Apply translucent styling to a Tkinter Spinbox widget."""
-    try:
-        spinbox.configure(
-            bg=colors["panel"],
-            fg=colors["text"],
-            insertbackground=colors["accent"],
-            disabledbackground=colors["background"],
-            highlightthickness=0,
-            relief="flat",
-            buttonbackground=colors["button"],
-        )
-    except tk.TclError:
+    if not safe_tk(lambda: spinbox.configure(
+        bg=colors["panel"],
+        fg=colors["text"],
+        insertbackground=colors["accent"],
+        disabledbackground=colors["background"],
+        highlightthickness=0,
+        relief="flat",
+        buttonbackground=colors["button"],
+    )):
         spinbox.configure(bg=colors["panel"], fg=colors["text"])

@@ -25,7 +25,7 @@ from scanning_tool.gui.overlays import (
 )
 from scanning_tool.state_context import app_state
 
-logger = logging.getLogger("scanning_tool")
+logger = logging.getLogger(__name__)
 
 
 class HeadSwaySection:

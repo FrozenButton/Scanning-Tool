@@ -11,7 +11,7 @@ import numpy as np
 from scanning_tool.state_context import app_state
 from scanning_tool.config import ensure_anchor_directory
 
-logger = logging.getLogger("scanning_tool")
+logger = logging.getLogger(__name__)
 
 
 class AnchorRegionTracker:

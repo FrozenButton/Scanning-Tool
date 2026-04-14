@@ -24,7 +24,7 @@ from scanning_tool.ollama import (
 from scanning_tool.state_context import app_state
 from scanning_tool.web import get_local_ip
 
-logger = logging.getLogger("scanning_tool")
+logger = logging.getLogger(__name__)
 
 
 SUGGESTED_MODELS = (

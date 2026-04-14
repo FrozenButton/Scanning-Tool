@@ -5,7 +5,7 @@ from typing import Callable, Optional, TypeVar
 
 import tkinter as tk
 
-logger = logging.getLogger("scanning_tool")
+logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
 TOPMOST_INTERVAL_MS = 1500

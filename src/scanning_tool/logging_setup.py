@@ -5,8 +5,8 @@ import logging.handlers
 
 
 def setup_logging() -> logging.Logger:
-    """Configure and return the application logger with console and file handlers."""
-    logger = logging.getLogger("scanning_tool")
+    """Configure and return the root logger with console and file handlers."""
+    logger = logging.getLogger()
     logger.setLevel(logging.INFO)
 
     if logger.handlers:

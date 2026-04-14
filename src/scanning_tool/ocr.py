@@ -9,7 +9,7 @@ from PIL import Image
 
 from scanning_tool.ollama import get_ollama_client, get_ollama_model
 
-logger = logging.getLogger("scanning_tool")
+logger = logging.getLogger(__name__)
 
 
 def ocr_with_ollama(pil_img: Image.Image, model: Optional[str] = None) -> str:
