@@ -11,6 +11,7 @@ from scanning_tool.gui.widgets import (
     create_button_row,
     create_labeled_combobox,
     create_labeled_entry,
+    create_status_label,
 )
 from scanning_tool.ollama import (
     ensure_model_installed,
@@ -52,23 +53,33 @@ class OllamaSection:
         self._active_host_var = tk.StringVar()
         self._active_model_var = tk.StringVar()
 
+        self._build_model_row(frame)
+        self._build_host_row(frame, ctx)
+        self._build_action_row(frame)
+        self._build_active_labels(frame)
+
+        self._refresh_active_labels()
+        return frame
+
+    def _build_model_row(self, parent: ttk.Widget) -> None:
         create_labeled_combobox(
-            frame,
+            parent,
             text="Ollama model (set in config.json or environment).",
             variable=self._model_var,
             values=list(SUGGESTED_MODELS),
             width=48,
         )
 
+    def _build_host_row(self, parent: ttk.Widget, ctx: SectionContext) -> None:
         create_labeled_entry(
-            frame,
+            parent,
             text="Remote Ollama host (IPv4/hostname with optional port). Leave blank to use this PC.",
             variable=self._host_var,
-            colors=ctx.colors,
         )
 
+    def _build_action_row(self, parent: ttk.Widget) -> None:
         create_button_row(
-            frame,
+            parent,
             [
                 ("Apply Host", self._apply_host),
                 ("Apply Model", self._apply_model),
@@ -77,17 +88,9 @@ class OllamaSection:
             ],
         )
 
-        ttk.Label(
-            frame, textvariable=self._active_host_var,
-            style="Glass.Small.TLabel", justify="left",
-        ).pack(fill="x", padx=5, pady=(0, 2))
-        ttk.Label(
-            frame, textvariable=self._active_model_var,
-            style="Glass.Small.TLabel", justify="left",
-        ).pack(fill="x", padx=5, pady=(0, 5))
-
-        self._refresh_active_labels()
-        return frame
+    def _build_active_labels(self, parent: ttk.Widget) -> None:
+        create_status_label(parent, self._active_host_var)
+        create_status_label(parent, self._active_model_var)
 
     def _refresh_active_labels(self) -> None:
         self._active_host_var.set(f"Active host: {get_ollama_host()}")

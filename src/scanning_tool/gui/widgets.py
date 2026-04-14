@@ -126,7 +126,6 @@ def create_labeled_entry(
     parent: ttk.Widget,
     text: str,
     variable: tk.Variable,
-    colors: GlassPalette,
 ) -> tk.Entry:
     """Create a labeled entry row with the custom glass styling."""
     row = create_section_row(parent)
@@ -135,6 +134,14 @@ def create_labeled_entry(
     entry = tk.Entry(row, textvariable=variable, width=40)
     entry.pack(side="left", padx=5, fill="x", expand=True)
     return entry
+
+
+def create_status_label(parent: ttk.Widget, variable: tk.Variable) -> ttk.Label:
+    """Create a styled status label row for section text feedback."""
+    row = create_section_row(parent, pady=(0, 2))
+    label = ttk.Label(row, textvariable=variable, style="Glass.Small.TLabel", justify="left")
+    label.pack(fill="x", padx=5)
+    return label
 
 
 def create_labeled_combobox(
