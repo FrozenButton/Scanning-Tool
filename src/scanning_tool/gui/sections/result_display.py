@@ -23,21 +23,35 @@ class ResultDisplaySection:
 
         overlay_offset = app_state.settings.overlay.info_overlay_offset
 
-        self._offset_x = create_glass_scale(
-            frame, text="Display offset X", minimum=-800, maximum=800,
-            initial=int(overlay_offset.get("x", 0)),
-            command=self._on_change,
+        self._offset_x = self._make_offset_scale(
+            frame, "Display offset X", -800, 800, int(overlay_offset.get("x", 0))
         )
-        self._offset_y = create_glass_scale(
-            frame, text="Display offset Y", minimum=-600, maximum=600,
-            initial=int(overlay_offset.get("y", 0)),
-            command=self._on_change,
-            padding=(0, 0),
+        self._offset_y = self._make_offset_scale(
+            frame, "Display offset Y", -600, 600, int(overlay_offset.get("y", 0)), padding=(0, 0)
         )
 
         register_overlay_sliders(self._offset_x, self._offset_y)
         sync_overlay_sliders()
         return frame
+
+    def _make_offset_scale(
+        self,
+        parent: ttk.Widget,
+        text: str,
+        minimum: float,
+        maximum: float,
+        initial: float,
+        padding: tuple[int, int] = (0, 4),
+    ) -> ttk.Scale:
+        return create_glass_scale(
+            parent,
+            text=text,
+            minimum=minimum,
+            maximum=maximum,
+            initial=initial,
+            command=self._on_change,
+            padding=padding,
+        )
 
     def _on_change(self, *_args: object) -> None:
         if app_state.control_state.gui_control_state["syncing"].get("overlay"):
