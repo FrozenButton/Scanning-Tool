@@ -3,7 +3,7 @@
 import tkinter as tk
 
 from scanning_tool.config import save_config
-from scanning_tool.overlay import stop_capture_overlay_animation
+from scanning_tool.gui.overlays import stop_capture_overlay_animation
 from scanning_tool.state import app_state
 
 

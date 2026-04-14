@@ -122,7 +122,7 @@ class AnchorRegionTracker:
 
 def perform_auto_alignment() -> bool:
     """Attempt to adjust the capture region based on anchor template matches."""
-    from scanning_tool.overlay import sync_capture_sliders, update_capture_overlay_region
+    from scanning_tool.gui.overlays import sync_capture_sliders, update_capture_overlay_region
 
     app_state.last_alignment_info.enabled = app_state.auto_align_enabled
 

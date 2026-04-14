@@ -17,7 +17,7 @@ from scanning_tool.gui.sections import (
 from scanning_tool.gui.status import StatusBar
 from scanning_tool.gui.theme import apply_glass_theme
 from scanning_tool.gui.widgets import ScrollableFrame
-from scanning_tool.overlay import show_overlay
+from scanning_tool.gui.overlays import show_overlay
 
 
 # Section build order — matches the original top-to-bottom layout.

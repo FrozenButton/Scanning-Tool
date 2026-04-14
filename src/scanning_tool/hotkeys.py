@@ -5,7 +5,7 @@ import logging
 import keyboard
 
 from scanning_tool.scanning import capture_once, toggle_continuous
-from scanning_tool.overlay import toggle_border
+from scanning_tool.gui.overlays import toggle_border
 
 logger = logging.getLogger("scanning_tool")
 

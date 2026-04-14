@@ -6,7 +6,7 @@ from tkinter import ttk
 from scanning_tool.config import save_config
 from scanning_tool.gui.sections.base import SectionContext
 from scanning_tool.gui.theme import style_spinbox
-from scanning_tool.overlay import (
+from scanning_tool.gui.overlays import (
     choose_label_color,
     toggle_border,
     update_overlay_region,

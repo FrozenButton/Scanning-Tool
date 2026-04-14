@@ -13,7 +13,7 @@ from scanning_tool.config import ensure_anchor_directory
 from scanning_tool.gui.sections.base import SectionContext
 from scanning_tool.gui.theme import style_spinbox
 from scanning_tool.gui.widgets import create_glass_scale
-from scanning_tool.overlay import (
+from scanning_tool.gui.overlays import (
     hide_anchor_overlay,
     register_anchor_sliders,
     show_anchor_overlay,

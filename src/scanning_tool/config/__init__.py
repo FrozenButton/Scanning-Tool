@@ -6,8 +6,6 @@ import os
 import sys
 from pathlib import Path
 
-from scanning_tool.state import app_state
-
 logger = logging.getLogger("scanning_tool")
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -34,6 +32,8 @@ def ensure_anchor_directory(path: str) -> None:
 def load_config() -> None:
     """Load configuration from config.json into app_state."""
     from scanning_tool.ollama_service import sanitize_ollama_host, reset_ollama_client
+
+    from scanning_tool.state import app_state
 
     if os.path.exists(CONFIG_FILE):
         try:
@@ -75,6 +75,8 @@ def load_config() -> None:
 
 def save_config() -> None:
     """Persist current app_state configuration to config.json."""
+    from scanning_tool.state import app_state
+
     data = {
         "CAP_REGION": app_state.cap_region,
         "label_color": app_state.label_color,
