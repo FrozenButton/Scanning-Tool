@@ -7,7 +7,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from scanning_tool.gui.sections.base import SectionContext
-from scanning_tool.ollama_service import (
+from scanning_tool.ollama import (
     ensure_model_installed,
     get_ollama_host,
     get_ollama_model,

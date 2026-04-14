@@ -7,7 +7,7 @@ import ollama
 
 from PIL import Image
 
-from scanning_tool.ollama_service import get_ollama_client, get_ollama_model
+from scanning_tool.ollama import get_ollama_client, get_ollama_model
 
 logger = logging.getLogger("scanning_tool")
 

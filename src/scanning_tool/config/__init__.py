@@ -31,7 +31,7 @@ def ensure_anchor_directory(path: str) -> None:
 
 def load_config() -> None:
     """Load configuration from config.json into app_state."""
-    from scanning_tool.ollama_service import sanitize_ollama_host, reset_ollama_client
+    from scanning_tool.ollama import sanitize_ollama_host, reset_ollama_client
 
     from scanning_tool.state_context import app_state
 

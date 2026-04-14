@@ -8,7 +8,7 @@ from scanning_tool.config import load_config
 from scanning_tool.deposits import load_rock_data
 from scanning_tool.state_context import app_state
 from scanning_tool.anchor import AnchorRegionTracker
-from scanning_tool.ollama_service import (
+from scanning_tool.ollama import (
     ensure_ollama_installed,
     ensure_ollama_running,
     ensure_model_installed,
