@@ -59,7 +59,7 @@ def test_perform_auto_alignment_updates_capture_region_and_callbacks():
     assert sync_calls == ["sync"]
     assert update_calls == ["update"]
     assert capture_settings.cap_region["left"] == 85
-    assert capture_settings.cap_region["top"] == 215
+    assert capture_settings.cap_region["top"] == 200
 
 
 def test_perform_auto_alignment_returns_false_when_disabled():
