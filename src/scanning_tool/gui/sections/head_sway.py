@@ -24,7 +24,7 @@ from scanning_tool.gui.overlays import (
     sync_anchor_sliders,
     update_anchor_overlay_region,
 )
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 logger = logging.getLogger(__name__)
 

@@ -7,7 +7,7 @@ from scanning_tool.core.auto_alignment import perform_auto_alignment
 from scanning_tool.gui.overlays import update_capture_overlay_region, sync_capture_sliders
 from scanning_tool.gui.overlays.base import safe_tk
 from scanning_tool.gui.status import StatusBar
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 
 _IDLE_ALIGNMENT_INFO = {

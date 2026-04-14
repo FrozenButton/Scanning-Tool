@@ -11,7 +11,7 @@ from .base import (
     MIN_INFO_OVERLAY_WIDTH,
     SCREEN_MARGIN,
 )
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 
 def compute_info_overlay_geometry(screen_width: int, screen_height: int) -> Tuple[int, int, int, int]:

@@ -4,7 +4,7 @@ import tkinter as tk
 
 from scanning_tool.config import save_config
 from scanning_tool.gui.overlays import destroy_all_overlays, stop_capture_overlay_animation
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 
 def register_close_handler(root: tk.Tk) -> None:
@@ -12,7 +12,7 @@ def register_close_handler(root: tk.Tk) -> None:
 
     def on_close() -> None:
         stop_capture_overlay_animation()
-        save_config()
+        save_config(app_state)
         destroy_all_overlays()
 
         overlay_state = app_state.overlay_state

@@ -5,7 +5,7 @@ import tkinter as tk
 from typing import Dict
 
 from scanning_tool.gui.control_state import ScaleWidget
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 from .base import safe_tk
 
 logger = logging.getLogger(__name__)

@@ -16,10 +16,14 @@ class AppContext:
     service_state: ServiceState
 
 
-app_state = AppContext(
-    settings=AppSettings(),
-    scan_state=ScanState(),
-    overlay_state=OverlayState(),
-    control_state=ControlState(),
-    service_state=ServiceState(),
-)
+def create_app_context() -> AppContext:
+    return AppContext(
+        settings=AppSettings(),
+        scan_state=ScanState(),
+        overlay_state=OverlayState(),
+        control_state=ControlState(),
+        service_state=ServiceState(),
+    )
+
+
+app_state = create_app_context()

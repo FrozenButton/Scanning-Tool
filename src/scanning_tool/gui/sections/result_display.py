@@ -9,7 +9,7 @@ from scanning_tool.gui.overlays import (
     reposition_info_overlay,
     sync_overlay_sliders,
 )
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 
 class ResultDisplaySection:

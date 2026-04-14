@@ -12,7 +12,7 @@ from scanning_tool.gui.overlays import (
     update_overlay_region,
 )
 from scanning_tool.scanning import capture_once, toggle_continuous
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 
 class ControlsSection:
@@ -45,7 +45,7 @@ class ControlsSection:
                 ("Loop Toggle", toggle_continuous),
                 ("Update Overlay", update_overlay_region),
                 ("Set Label Color", choose_label_color),
-                ("Save Config", save_config),
+                ("Save Config", lambda: save_config(app_state)),
                 ("Toggle Border", toggle_border),
             ],
         )

@@ -1,5 +1,5 @@
 import ollama
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 from .host import get_ollama_host
 

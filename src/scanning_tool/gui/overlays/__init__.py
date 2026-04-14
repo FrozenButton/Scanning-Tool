@@ -31,7 +31,7 @@ from .slider_sync import (
     sync_capture_sliders,
     sync_overlay_sliders,
 )
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 __all__ = [
     "choose_label_color",

@@ -3,27 +3,29 @@
 import logging
 from threading import Thread
 
-from scanning_tool.logging_setup import setup_logging
+from threading import Thread
+
 from scanning_tool.config import load_config
 from scanning_tool.deposits import load_rock_data
-from scanning_tool.state_context import app_state
-from scanning_tool.core.anchor import AnchorRegionTracker
+from scanning_tool.gui.app import launch_gui
+from scanning_tool.hotkeys import hotkey_listener
+from scanning_tool.logging_setup import setup_logging
 from scanning_tool.ollama import (
+    ensure_model_installed,
     ensure_ollama_installed,
     ensure_ollama_running,
-    ensure_model_installed,
     log_model_running_status,
 )
-from scanning_tool.hotkeys import hotkey_listener
+from scanning_tool.state.context import app_state
+from scanning_tool.core.anchor import AnchorRegionTracker
 from scanning_tool.web import create_app, get_local_ip
-from scanning_tool.gui.app import launch_gui
 
 
 def main() -> None:
     """Launch the scanning tool."""
     logger = setup_logging()
 
-    load_config()
+    load_config(app_state)
     load_rock_data()
 
     ensure_ollama_installed()

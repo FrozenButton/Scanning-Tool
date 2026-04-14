@@ -7,7 +7,7 @@ from threading import Thread
 import mss
 from PIL import Image
 
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 from scanning_tool.ocr import ocr_with_ollama
 from scanning_tool.deposits import extract_code_from_text, lookup_deposit
 from scanning_tool.core.auto_alignment import perform_auto_alignment

@@ -4,7 +4,7 @@ import time
 import tkinter as tk
 from typing import Dict, Optional
 
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 
 class StatusBar:

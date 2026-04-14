@@ -6,7 +6,7 @@ from dataclasses import asdict
 
 from flask import Flask, jsonify, render_template, request
 
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 from scanning_tool.config import resource_path
 ## Removed import of MULTIPLIER_CODES (now replaced by dynamic scan signature data)
 

@@ -9,7 +9,7 @@ from scanning_tool.gui.overlays import (
     sync_capture_sliders,
     update_capture_overlay_region,
 )
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 
 class CaptureRegionSection:

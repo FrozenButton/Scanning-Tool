@@ -6,7 +6,7 @@ import sys
 import time
 
 from .host import get_ollama_host, is_local_ollama_host, _get_host_port
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 logger = logging.getLogger(__name__)
 

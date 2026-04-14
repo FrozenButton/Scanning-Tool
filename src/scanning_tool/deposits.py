@@ -6,7 +6,7 @@ import re
 from typing import Any, Dict, List, Optional
 
 from scanning_tool.config import ROCK_TYPE_FILE
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 logger = logging.getLogger(__name__)
 

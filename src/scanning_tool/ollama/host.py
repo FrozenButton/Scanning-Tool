@@ -3,7 +3,7 @@ from typing import Tuple
 from urllib.parse import urlparse
 
 from scanning_tool.config import save_config
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 
 def sanitize_ollama_host(value: str) -> str:
@@ -33,11 +33,11 @@ def set_configured_ollama_model(value: str) -> str:
         if sanitized != app_state.settings.ollama.ollama_model:
             app_state.settings.ollama.ollama_model = sanitized
             os.environ["OLLAMA_MODEL"] = sanitized
-            save_config()
+            save_config(app_state)
     else:
         app_state.settings.ollama.ollama_model = ""
         os.environ.pop("OLLAMA_MODEL", None)
-        save_config()
+        save_config(app_state)
     return sanitized
 
 

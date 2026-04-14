@@ -8,7 +8,7 @@ from typing import Dict, Optional
 from .base import create_overlay_window, safe_tk
 from .capture import _capture_overlay
 from .geometry import compute_info_overlay_geometry
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 
 
 class InfoOverlay:

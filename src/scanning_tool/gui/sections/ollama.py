@@ -21,7 +21,7 @@ from scanning_tool.ollama import (
     set_configured_ollama_host,
     set_configured_ollama_model,
 )
-from scanning_tool.state_context import app_state
+from scanning_tool.state import app_state
 from scanning_tool.web import get_local_ip
 
 logger = logging.getLogger(__name__)
