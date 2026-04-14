@@ -4,9 +4,10 @@ import json
 import logging
 import os
 import sys
-from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict
+from typing import Dict
+
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from scanning_tool.config.settings import AppSettings
 from scanning_tool.state.context import AppContext
@@ -19,9 +20,10 @@ ROCK_TYPE_FILENAME = "RockType.json"
 ROCK_TYPE_FILE = PROJECT_ROOT / ROCK_TYPE_FILENAME
 
 
-@dataclass
-class ConfigData:
-    CAP_REGION: Dict[str, int] = field(default_factory=lambda: {
+class ConfigData(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    CAP_REGION: Dict[str, int] = Field(default_factory=lambda: {
         "left": 1260,
         "top": 310,
         "width": 160,
@@ -29,25 +31,20 @@ class ConfigData:
     })
     label_color: str = "yellow"
     AUTO_ALIGN_ENABLED: bool = True
-    ANCHOR_REGION: Dict[str, int] = field(default_factory=lambda: {
+    ANCHOR_REGION: Dict[str, int] = Field(default_factory=lambda: {
         "left": 1100,
         "top": 240,
         "width": 320,
         "height": 140,
     })
-    ANCHOR_OFFSET: Dict[str, int] = field(default_factory=lambda: {"x": 36, "y": 56})
+    ANCHOR_OFFSET: Dict[str, int] = Field(default_factory=lambda: {"x": 36, "y": 56})
     ANCHOR_THRESHOLD: float = 0.82
     ANCHOR_TEMPLATE_DIR: str = "assets/anchor_templates"
     ALIGNMENT_POLL_INTERVAL_MS: int = 500
     CONTINUOUS_CAPTURE_INTERVAL: float = 2.0
-    INFO_OVERLAY_OFFSET: Dict[str, int] = field(default_factory=lambda: {"x": 0, "y": 0})
+    INFO_OVERLAY_OFFSET: Dict[str, int] = Field(default_factory=lambda: {"x": 0, "y": 0})
     OLLAMA_HOST: str = ""
     OLLAMA_MODEL: str = ""
-
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "ConfigData":
-        valid_items = {k: v for k, v in data.items() if k in cls.__annotations__}
-        return cls(**valid_items)
 
     @classmethod
     def from_settings(cls, settings: AppSettings) -> "ConfigData":
@@ -105,7 +102,7 @@ def load_config(app_context: AppContext, config_file: Path = CONFIG_FILE) -> Non
         try:
             with open(config_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            config = ConfigData.from_dict(data)
+            config = ConfigData.model_validate(data)
             env_model = os.getenv("OLLAMA_MODEL", "").strip()
             if env_model:
                 config.OLLAMA_MODEL = env_model
@@ -116,9 +113,8 @@ def load_config(app_context: AppContext, config_file: Path = CONFIG_FILE) -> Non
                 if configured_host:
                     os.environ["OLLAMA_HOST"] = configured_host
                 reset_ollama_client()
-
             config.OLLAMA_HOST = configured_host
-        except (json.JSONDecodeError, OSError) as exc:
+        except (json.JSONDecodeError, OSError, ValidationError) as exc:
             logger.warning(f"Config file invalid or empty, resetting: {exc}")
             save_config(app_context, config_file)
     else:
@@ -133,6 +129,6 @@ def save_config(app_context: AppContext, config_file: Path = CONFIG_FILE) -> Non
     """Persist the provided app context configuration to disk."""
     config = ConfigData.from_settings(app_context.settings)
     with open(config_file, "w", encoding="utf-8") as f:
-        json.dump(asdict(config), f, indent=4)
+        json.dump(config.model_dump(), f, indent=4)
         f.write("\n")
     logger.info("Config saved.")

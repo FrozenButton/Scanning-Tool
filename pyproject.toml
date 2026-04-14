@@ -15,6 +15,7 @@ dependencies = [
     "flask",
     "keyboard",
     "ollama",
+    "pydantic",
 ]
 
 [project.scripts]

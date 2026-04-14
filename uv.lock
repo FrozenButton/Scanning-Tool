@@ -3627,6 +3627,7 @@ dependencies = [
     { name = "ollama" },
     { name = "opencv-python" },
     { name = "pillow" },
+    { name = "pydantic" },
 ]
 
 [package.optional-dependencies]
@@ -3643,6 +3644,7 @@ requires-dist = [
     { name = "ollama" },
     { name = "opencv-python" },
     { name = "pillow" },
+    { name = "pydantic" },
     { name = "pytest", marker = "extra == 'tests'" },
 ]
 provides-extras = ["tests"]
