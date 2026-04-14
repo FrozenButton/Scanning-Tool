@@ -7,6 +7,11 @@ import tkinter as tk
 from tkinter import ttk
 
 from scanning_tool.gui.sections.base import SectionContext
+from scanning_tool.gui.widgets import (
+    create_button_row,
+    create_labeled_combobox,
+    create_labeled_entry,
+)
 from scanning_tool.ollama import (
     ensure_model_installed,
     get_ollama_host,
@@ -47,33 +52,30 @@ class OllamaSection:
         self._active_host_var = tk.StringVar()
         self._active_model_var = tk.StringVar()
 
-        ttk.Label(
+        create_labeled_combobox(
             frame,
             text="Ollama model (set in config.json or environment).",
-            style="Glass.Small.TLabel", wraplength=360, justify="left",
-        ).pack(fill="x", padx=5, pady=(5, 2))
-        ttk.Combobox(
-            frame, textvariable=self._model_var, values=list(SUGGESTED_MODELS),
-        ).pack(fill="x", padx=5, pady=(0, 5))
+            variable=self._model_var,
+            values=list(SUGGESTED_MODELS),
+            width=48,
+        )
 
-        ttk.Label(
+        create_labeled_entry(
             frame,
             text="Remote Ollama host (IPv4/hostname with optional port). Leave blank to use this PC.",
-            style="Glass.Small.TLabel", wraplength=360, justify="left",
-        ).pack(fill="x", padx=5, pady=(5, 2))
-        ttk.Entry(frame, textvariable=self._host_var).pack(fill="x", padx=5, pady=(0, 5))
+            variable=self._host_var,
+            colors=ctx.colors,
+        )
 
-        button_row = ttk.Frame(frame, style="Glass.Section.TFrame")
-        button_row.pack(fill="x", padx=5, pady=(0, 5))
-        for label, command in (
-            ("Apply Host", self._apply_host),
-            ("Apply Model", self._apply_model),
-            ("Use Localhost", self._use_localhost),
-            ("Open Mobile UI", self._open_mobile_overlay),
-        ):
-            ttk.Button(button_row, text=label, command=command, style="Glass.TButton").pack(
-                side="left", padx=5
-            )
+        create_button_row(
+            frame,
+            [
+                ("Apply Host", self._apply_host),
+                ("Apply Model", self._apply_model),
+                ("Use Localhost", self._use_localhost),
+                ("Open Mobile UI", self._open_mobile_overlay),
+            ],
+        )
 
         ttk.Label(
             frame, textvariable=self._active_host_var,

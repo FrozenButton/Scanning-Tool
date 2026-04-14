@@ -122,6 +122,37 @@ def create_labeled_spinbox(
     return spinbox
 
 
+def create_labeled_entry(
+    parent: ttk.Widget,
+    text: str,
+    variable: tk.Variable,
+    colors: GlassPalette,
+) -> tk.Entry:
+    """Create a labeled entry row with the custom glass styling."""
+    row = create_section_row(parent)
+    ttk.Label(row, text=text, style="Glass.Small.TLabel").pack(side="left")
+
+    entry = tk.Entry(row, textvariable=variable, width=40)
+    entry.pack(side="left", padx=5, fill="x", expand=True)
+    return entry
+
+
+def create_labeled_combobox(
+    parent: ttk.Widget,
+    text: str,
+    variable: tk.Variable,
+    values: list[str],
+    width: int = 40,
+) -> ttk.Combobox:
+    """Create a labeled combobox row with the custom glass styling."""
+    row = create_section_row(parent)
+    ttk.Label(row, text=text, style="Glass.Small.TLabel").pack(side="left")
+
+    combobox = ttk.Combobox(row, textvariable=variable, values=values, width=width)
+    combobox.pack(side="left", padx=5, fill="x", expand=True)
+    return combobox
+
+
 def create_button_row(
     parent: ttk.Widget,
     buttons: list[tuple[str, Callable[[], None]]],
