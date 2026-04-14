@@ -23,27 +23,35 @@ class CaptureRegionSection:
 
         cap_region = app_state.settings.capture.cap_region
 
-        self._left = create_glass_scale(
-            frame, text="Left", minimum=0, maximum=3000,
-            initial=cap_region["left"], command=self._on_change,
-        )
-        self._top = create_glass_scale(
-            frame, text="Top", minimum=0, maximum=2000,
-            initial=cap_region["top"], command=self._on_change,
-        )
-        self._width = create_glass_scale(
-            frame, text="Width", minimum=50, maximum=1000,
-            initial=cap_region["width"], command=self._on_change,
-        )
-        self._height = create_glass_scale(
-            frame, text="Height", minimum=20, maximum=500,
-            initial=cap_region["height"], command=self._on_change,
-            padding=(0, 0),
+        self._left = self._make_capture_scale(frame, "Left", 0, 3000, cap_region["left"])
+        self._top = self._make_capture_scale(frame, "Top", 0, 2000, cap_region["top"])
+        self._width = self._make_capture_scale(frame, "Width", 50, 1000, cap_region["width"])
+        self._height = self._make_capture_scale(
+            frame, "Height", 20, 500, cap_region["height"], padding=(0, 0)
         )
 
         register_capture_sliders(self._left, self._top, self._width, self._height)
         sync_capture_sliders()
         return frame
+
+    def _make_capture_scale(
+        self,
+        parent: ttk.Widget,
+        text: str,
+        minimum: float,
+        maximum: float,
+        initial: float,
+        padding: tuple[int, int] = (0, 4),
+    ) -> ttk.Scale:
+        return create_glass_scale(
+            parent,
+            text=text,
+            minimum=minimum,
+            maximum=maximum,
+            initial=initial,
+            command=self._on_change,
+            padding=padding,
+        )
 
     def _on_change(self, *_args: object) -> None:
         if app_state.control_state.gui_control_state["syncing"]["capture"]:
