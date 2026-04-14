@@ -10,9 +10,15 @@ import tkinter as tk
 from tkinter import ttk
 
 from scanning_tool.anchor import AnchorRegionTracker, perform_auto_alignment
-from scanning_tool.config import ensure_anchor_directory, save_config
+from scanning_tool.config import ensure_anchor_directory
 from scanning_tool.gui.alignment import AlignmentPoller
 from scanning_tool.gui.lifecycle import register_close_handler
+from scanning_tool.gui.sections import (
+    CaptureRegionSection,
+    ControlsSection,
+    ResultDisplaySection,
+    SectionContext,
+)
 from scanning_tool.gui.status import StatusBar
 from scanning_tool.gui.theme import apply_glass_theme, style_spinbox
 from scanning_tool.gui.widgets import ScrollableFrame, create_glass_scale
@@ -25,23 +31,13 @@ from scanning_tool.ollama_service import (
     set_configured_ollama_model,
 )
 from scanning_tool.overlay import (
-    choose_label_color,
     hide_anchor_overlay,
     register_anchor_sliders,
-    register_capture_sliders,
-    register_overlay_sliders,
-    reposition_info_overlay,
     show_anchor_overlay,
     show_overlay,
     sync_anchor_sliders,
-    sync_capture_sliders,
-    sync_overlay_sliders,
-    toggle_border,
     update_anchor_overlay_region,
-    update_capture_overlay_region,
-    update_overlay_region,
 )
-from scanning_tool.scanning import capture_once, toggle_continuous
 from scanning_tool.state import app_state
 from scanning_tool.web import get_local_ip
 
@@ -57,6 +53,7 @@ def launch_gui() -> None:
     colors = apply_glass_theme(root)
     status = StatusBar(root)
     status.install_as_scanning_callback()
+    ctx = SectionContext(root=root, colors=colors, status=status)
 
     ollama_host_var = tk.StringVar(value=app_state.configured_ollama_host)
     ollama_model_var = tk.StringVar(value=app_state.ollama_model)
@@ -68,16 +65,6 @@ def launch_gui() -> None:
 
     def refresh_active_model_label() -> None:
         ollama_active_model_var.set(f"Active model: {get_ollama_model()}")
-
-    def update_region_from_sliders(*_args: object) -> None:
-        if app_state.gui_control_state["syncing"]["capture"]:
-            return
-        app_state.cap_region["left"] = int(slider_left.get())
-        app_state.cap_region["top"] = int(slider_top.get())
-        app_state.cap_region["width"] = int(slider_width.get())
-        app_state.cap_region["height"] = int(slider_height.get())
-        status.set_status(f"CAP_REGION updated: {app_state.cap_region}")
-        update_capture_overlay_region()
 
     def update_anchor_region_from_sliders(*_args: object) -> None:
         if app_state.gui_control_state["syncing"]["anchor"]:
@@ -99,17 +86,6 @@ def launch_gui() -> None:
         status.set_anchor(f"Anchor offset updated: {app_state.anchor_offset}", hold=2.0)
         if app_state.auto_align_enabled:
             perform_auto_alignment()
-
-    def update_info_overlay_from_sliders(*_args: object) -> None:
-        if app_state.gui_control_state["syncing"].get("overlay"):
-            return
-        app_state.info_overlay_offset["x"] = int(info_offset_x.get())
-        app_state.info_overlay_offset["y"] = int(info_offset_y.get())
-        status.set_status(
-            f"Display offset updated: x={app_state.info_overlay_offset['x']}, "
-            f"y={app_state.info_overlay_offset['y']}"
-        )
-        reposition_info_overlay()
 
     def toggle_auto_align() -> None:
         app_state.auto_align_enabled = auto_align_var.get()
@@ -189,17 +165,6 @@ def launch_gui() -> None:
             f"Alignment interval set to {app_state.alignment_poll_interval_ms} ms", hold=2.0
         )
 
-    def update_capture_interval(*_args: object) -> None:
-        try:
-            value = float(capture_interval_var.get())
-        except (tk.TclError, ValueError):
-            return
-        value = max(0.2, min(30.0, value))
-        app_state.continuous_capture_interval = value
-        status.set_status(
-            f"Continuous capture interval set to {app_state.continuous_capture_interval:.1f}s"
-        )
-
     def apply_ollama_model_from_ui() -> None:
         model_value = ollama_model_var.get().strip()
         if not model_value:
@@ -260,30 +225,7 @@ def launch_gui() -> None:
     scroll = ScrollableFrame(root, colors)
     main = scroll.inner
 
-    # --- Capture Region ---
-    frm_region = ttk.LabelFrame(main, text="Capture Region", style="Glass.TLabelframe")
-    frm_region.pack(fill="x", padx=5, pady=8)
-
-    slider_left = create_glass_scale(
-        frm_region, text="Left", minimum=0, maximum=3000,
-        initial=app_state.cap_region["left"], command=update_region_from_sliders,
-    )
-    slider_top = create_glass_scale(
-        frm_region, text="Top", minimum=0, maximum=2000,
-        initial=app_state.cap_region["top"], command=update_region_from_sliders,
-    )
-    slider_width = create_glass_scale(
-        frm_region, text="Width", minimum=50, maximum=1000,
-        initial=app_state.cap_region["width"], command=update_region_from_sliders,
-    )
-    slider_height = create_glass_scale(
-        frm_region, text="Height", minimum=20, maximum=500,
-        initial=app_state.cap_region["height"], command=update_region_from_sliders,
-        padding=(0, 0),
-    )
-
-    register_capture_sliders(slider_left, slider_top, slider_width, slider_height)
-    sync_capture_sliders()
+    CaptureRegionSection().build(main, ctx)
 
     # --- Head Sway Compensation ---
     frm_anchor = ttk.LabelFrame(main, text="Head Sway Compensation", style="Glass.TLabelframe")
@@ -401,51 +343,8 @@ def launch_gui() -> None:
     ttk.Button(anchor_btn_row, text="Realign Now", command=manual_realign, style="Glass.TButton").pack(side="left", padx=5)
     ttk.Button(anchor_btn_row, text="Open Template Folder", command=open_anchor_directory, style="Glass.TButton").pack(side="left", padx=5)
 
-    # --- Result Display ---
-    frm_display = ttk.LabelFrame(main, text="Result Display", style="Glass.TLabelframe")
-    frm_display.pack(fill="x", padx=5, pady=8)
-
-    info_offset_x = create_glass_scale(
-        frm_display, text="Display offset X", minimum=-800, maximum=800,
-        initial=int(app_state.info_overlay_offset.get("x", 0)),
-        command=update_info_overlay_from_sliders,
-    )
-    info_offset_y = create_glass_scale(
-        frm_display, text="Display offset Y", minimum=-600, maximum=600,
-        initial=int(app_state.info_overlay_offset.get("y", 0)),
-        command=update_info_overlay_from_sliders,
-        padding=(0, 0),
-    )
-
-    register_overlay_sliders(info_offset_x, info_offset_y)
-    sync_overlay_sliders()
-
-    # --- Controls ---
-    frm_ctrl = ttk.LabelFrame(main, text="Controls", style="Glass.TLabelframe")
-    frm_ctrl.pack(fill="x", padx=5, pady=8)
-
-    capture_interval_frame = ttk.Frame(frm_ctrl, style="Glass.Section.TFrame")
-    capture_interval_frame.pack(fill="x", padx=5, pady=(5, 10))
-    ttk.Label(capture_interval_frame, text="Continuous capture interval (s)", style="Glass.Small.TLabel").pack(side="left")
-    capture_interval_var = tk.DoubleVar(value=float(app_state.continuous_capture_interval))
-    capture_interval_spin = tk.Spinbox(
-        capture_interval_frame, from_=0.2, to=30.0, increment=0.1,
-        textvariable=capture_interval_var, width=6, format="%.1f",
-        command=update_capture_interval,
-    )
-    capture_interval_spin.pack(side="left", padx=5)
-    style_spinbox(capture_interval_spin, colors)
-    capture_interval_var.trace_add("write", update_capture_interval)
-
-    button_row = ttk.Frame(frm_ctrl, style="Glass.Section.TFrame")
-    button_row.pack(fill="x", padx=5, pady=(0, 5))
-
-    ttk.Button(button_row, text="Single Scan", command=capture_once, style="Glass.TButton").pack(side="left", padx=5)
-    ttk.Button(button_row, text="Loop Toggle", command=toggle_continuous, style="Glass.TButton").pack(side="left", padx=5)
-    ttk.Button(button_row, text="Update Overlay", command=update_overlay_region, style="Glass.TButton").pack(side="left", padx=5)
-    ttk.Button(button_row, text="Set Label Color", command=choose_label_color, style="Glass.TButton").pack(side="left", padx=5)
-    ttk.Button(button_row, text="Save Config", command=save_config, style="Glass.TButton").pack(side="left", padx=5)
-    ttk.Button(button_row, text="Toggle Border", command=toggle_border, style="Glass.TButton").pack(side="left", padx=5)
+    ResultDisplaySection().build(main, ctx)
+    ControlsSection().build(main, ctx)
 
     ttk.Label(main, textvariable=status.status_var, anchor="w", justify="left", style="Glass.Status.TLabel").pack(
         fill="x", padx=5, pady=(8, 0)
