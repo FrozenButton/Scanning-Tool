@@ -173,13 +173,7 @@ def perform_auto_alignment() -> bool:
     info.capture_top = capture_settings.cap_region["top"]
 
     sync_capture_sliders()
-
-    if overlay_state.capture_overlay_root:
-        try:
-            import tkinter as tk
-            overlay_state.capture_overlay_root.after(0, update_capture_overlay_region)
-        except (RuntimeError, Exception):
-            update_capture_overlay_region()
+    update_capture_overlay_region()
 
     logger.debug(
         "Auto alignment applied using %s (score %.3f) => CAP_REGION left/top updated to (%d, %d)",
