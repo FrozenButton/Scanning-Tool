@@ -35,7 +35,7 @@ def capture_once() -> None:
             pil_img = Image.frombytes("RGB", img.size, img.rgb)
         if status_callback:
             status_callback("Loading OCR model (may take a moment)...")
-        logger.info("Loading OCR model for scan...")
+        logger.debug("Loading OCR model for scan...")
         try:
             raw_text = ocr_with_ollama(pil_img)
             code, raw = extract_code_from_text(raw_text)
