@@ -491,11 +491,18 @@ def launch_gui() -> None:
     ollama_active_host_var = tk.StringVar()
     ollama_active_model_var = tk.StringVar(value=f"Active model: {get_ollama_model()}")
 
+
     def refresh_active_host_label() -> None:
         ollama_active_host_var.set(f"Active host: {get_ollama_host()}")
 
     def refresh_active_model_label() -> None:
         ollama_active_model_var.set(f"Active model: {get_ollama_model()}")
+
+    # Provide a status callback for scanning
+    def gui_status_callback(msg: str):
+        status_var.set(msg)
+        root.update_idletasks()
+    app_state.gui_status_callback = gui_status_callback
 
     def apply_ollama_model_from_ui() -> None:
         model_value = ollama_model_var.get().strip()

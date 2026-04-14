@@ -26,5 +26,5 @@
         "y": 0
     },
     "OLLAMA_HOST": "",
-    "OLLAMA_MODEL": "moondream:1.8b"
+    "OLLAMA_MODEL": "qwen2.5vl:3b"
 }

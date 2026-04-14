@@ -39,7 +39,9 @@ def ocr_with_ollama(pil_img: Image.Image, model: Optional[str] = None) -> str:
             prompt = "Extract all numbers from this image. Only output the numbers."
         elif m.startswith("llava"):
             prompt = "What numbers are visible in this image? Only output the numbers."
-    logger.info(f"Using OCR prompt for model '{model}': {prompt}")
+        elif m.startswith("qwen2.5vl"):
+            prompt = "Extract all numbers from this image. Only output the numbers."
+    logger.debug(f"Using OCR prompt for model '{model}': {prompt}")
     try:
         response: ollama.ChatResponse = client.chat(
             model=model,

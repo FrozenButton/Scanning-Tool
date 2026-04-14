@@ -17,27 +17,45 @@ logger = logging.getLogger("scanning_tool")
 
 
 def capture_once() -> None:
-    """Capture one scan from the capture region and update overlay."""
-    auto_aligned = perform_auto_alignment()
-    if app_state.auto_align_enabled:
-        logger.debug("Auto alignment %s before capture.", "succeeded" if auto_aligned else "did not match")
-    with mss.mss() as sct:
-        monitor = {
-            "left": app_state.cap_region["left"],
-            "top": app_state.cap_region["top"],
-            "width": app_state.cap_region["width"],
-            "height": app_state.cap_region["height"],
-        }
-        img = sct.grab(monitor)
-        pil_img = Image.frombytes("RGB", img.size, img.rgb)
+    """Capture one scan from the capture region and update overlay. Accepts optional status_callback for UI feedback."""
+    def _do_capture(status_callback=None):
+        if status_callback:
+            status_callback("Aligning region...")
+        auto_aligned = perform_auto_alignment()
+        if app_state.auto_align_enabled:
+            logger.debug("Auto alignment %s before capture.", "succeeded" if auto_aligned else "did not match")
+        with mss.mss() as sct:
+            monitor = {
+                "left": app_state.cap_region["left"],
+                "top": app_state.cap_region["top"],
+                "width": app_state.cap_region["width"],
+                "height": app_state.cap_region["height"],
+            }
+            img = sct.grab(monitor)
+            pil_img = Image.frombytes("RGB", img.size, img.rgb)
+        if status_callback:
+            status_callback("Loading OCR model (may take a moment)...")
+        logger.info("Loading OCR model for scan...")
+        try:
+            raw_text = ocr_with_ollama(pil_img)
+            code, raw = extract_code_from_text(raw_text)
+            info = lookup_deposit(code)
+            app_state.last_result = {"code": code, "code_raw": raw, "info": info, "raw_text": raw_text}
+            update_overlay_label(info, code=code, raw_text=raw or raw_text)
+            logger.info(f"Scan result: {app_state.last_result}")
+            if status_callback:
+                status_callback("Scan complete.")
+        except Exception as e:
+            logger.error(f"OCR/model error: {e}")
+            if status_callback:
+                status_callback(f"OCR/model error: {e}")
 
-    raw_text = ocr_with_ollama(pil_img)
-    code, raw = extract_code_from_text(raw_text)
-    info = lookup_deposit(code)
-
-    app_state.last_result = {"code": code, "code_raw": raw, "info": info, "raw_text": raw_text}
-    update_overlay_label(info, code=code, raw_text=raw or raw_text)
-    logger.info(f"Scan result: {app_state.last_result}")
+    # If called from GUI, run in a thread and provide status callback
+    import threading
+    if hasattr(app_state, "gui_status_callback") and app_state.gui_status_callback:
+        threading.Thread(target=_do_capture, args=(app_state.gui_status_callback,), daemon=True).start()
+    else:
+        _do_capture()
 
 
 def toggle_continuous() -> None:
