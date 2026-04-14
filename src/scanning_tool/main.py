@@ -1,0 +1,52 @@
+"""Main entry point - startup orchestration."""
+
+import logging
+from threading import Thread
+
+from scanning_tool.logging_setup import setup_logging
+from scanning_tool.config import load_config
+from scanning_tool.deposits import load_rock_data
+from scanning_tool.state import app_state
+from scanning_tool.anchor import AnchorRegionTracker
+from scanning_tool.ollama_service import (
+    ensure_ollama_installed,
+    ensure_ollama_running,
+    ensure_model_installed,
+    log_model_running_status,
+)
+from scanning_tool.hotkeys import hotkey_listener
+from scanning_tool.web import create_app, get_local_ip
+from scanning_tool.gui import launch_gui
+
+
+def main() -> None:
+    """Launch the scanning tool."""
+    logger = setup_logging()
+
+    load_config()
+    load_rock_data()
+
+    ensure_ollama_installed()
+    ensure_ollama_running()
+    ensure_model_installed()
+    log_model_running_status()
+
+    app_state.anchor_tracker = AnchorRegionTracker(
+        app_state.anchor_template_dir, app_state.anchor_threshold
+    )
+
+    Thread(target=hotkey_listener, daemon=True).start()
+
+    local_ip = get_local_ip()
+    logger.info(
+        "Starting overlay server: http://127.0.0.1:5000 (this device) | "
+        f"http://{local_ip}:5000 (local network)"
+    )
+
+    flask_app = create_app()
+    Thread(
+        target=lambda: flask_app.run(host="0.0.0.0", port=5000, debug=False),
+        daemon=True,
+    ).start()
+
+    launch_gui()

@@ -7,9 +7,9 @@
 [![GitHub issues](https://img.shields.io/github/issues/FrozenButton/Scanning-Tool)](https://github.com/FrozenButton/Scanning-Tool/issues)
 
 ## What it does
-- Captures the HUD deposit code, reads it with the `qwen3-vl:2b` model, and shows the deposit type/quantity.
+ - Captures the HUD deposit code, reads it with the `qwen2.5vl:3b` model, and shows the deposit type/quantity.
 
-**Note:** The scanner now uses the `qwen3-vl:2b` model, which offers better OCR accuracy, faster processing, and lower VRAM usage compared to the previous `qwen2.5vl:3b` model. This upgrade is specifically beneficial for reading Star Citizen HUD codes in real-time, even on systems with limited GPU resources.
+**Note:** The scanner always defaults to the stable `qwen2.5vl:3b` model. You can select another supported Ollama model in the GUI or via `OLLAMA_MODEL` in `config.json` or the environment.
 - Locks to a user-selected HUD anchor so the capture box follows head sway and ship movement.
 - Hosts a small web overlay (desktop + mobile friendly) so you can view the latest scan from a browser; a GUI button opens it for you.
 
@@ -37,6 +37,7 @@
 ## Ollama setup
 - **Same PC (default):** Install Ollama from [ollama.com](https://ollama.com/) and restart/log back in once. The scanner will connect to `http://127.0.0.1:11434` by default and start the service automatically when needed.
 - **Remote PC:** Install and allow network access on the Ollama machine (`OLLAMA_HOST=0.0.0.0`, firewall port 11434 open). In the scanner GUI, enter the remote host (e.g., `http://192.168.1.42:11434`) in **Ollama Connection → Apply Host**. You can also set `OLLAMA_HOST` in `config.json` or as an environment variable before launching.
+- **Model selection:** Choose the Ollama model in the GUI or by setting `OLLAMA_MODEL` in `config.json` or the environment before launch.
 
 ## Using the scanner
 - **Positioning:** Use the capture sliders to place the red box over the deposit code. Toggle visibility with **8**.

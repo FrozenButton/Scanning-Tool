@@ -28,6 +28,7 @@ wheels/
 pip-wheel-metadata/
 share/python-wheels/
 *.egg-info/
+src/scanning_tool.egg-info/
 .installed.cfg
 *.egg
 MANIFEST

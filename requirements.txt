@@ -5,3 +5,4 @@ mss
 flask
 keyboard
 ollama
+playwright>=1.44.0

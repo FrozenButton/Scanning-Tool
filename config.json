@@ -1,21 +1,21 @@
 {
     "CAP_REGION": {
-        "left": 1146,
-        "top": 277,
+        "left": 850,
+        "top": 339,
         "width": 185,
         "height": 30
     },
     "label_color": "#4bf569",
     "AUTO_ALIGN_ENABLED": true,
     "ANCHOR_REGION": {
-        "left": 1100,
-        "top": 240,
+        "left": 857,
+        "top": 258,
         "width": 320,
         "height": 140
     },
     "ANCHOR_OFFSET": {
-        "x": 36,
-        "y": 56
+        "x": 0,
+        "y": 0
     },
     "ANCHOR_THRESHOLD": 0.82,
     "ANCHOR_TEMPLATE_DIR": "assets/anchor_templates",
@@ -25,5 +25,6 @@
         "x": 0,
         "y": 0
     },
-    "OLLAMA_HOST": ""
+    "OLLAMA_HOST": "",
+    "OLLAMA_MODEL": "moondream:1.8b"
 }

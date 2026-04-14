@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "scanning-tool"
+version = "1.0.0"
+description = "Star Citizen deposit scanner with OCR and overlay"
+requires-python = ">=3.10"
+dependencies = [
+    "pillow",
+    "opencv-python",
+    "numpy",
+    "mss",
+    "flask",
+    "keyboard",
+    "ollama",
+]
+
+[project.scripts]
+scanning-tool = "scanning_tool.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/scanning_tool"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

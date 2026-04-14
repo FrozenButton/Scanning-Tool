@@ -1,0 +1,30 @@
+mineral,category,base_value,max_multiplier
+Quantainium,legendary,3170,2
+Stileron,legendary,3185,2
+Savrilium,legendary,3200,2
+Ouratite,epic,3370,3
+Riccite,epic,3385,3
+Lindinium,epic,3400,3
+Beryl,rare,3540,4
+Taranite,rare,3555,4
+Borase,rare,3570,4
+Gold,rare,3585,4
+Bexalite,rare,3600,4
+Laranite,uncommon,3825,5
+Aslarite,uncommon,3840,5
+Titanium,uncommon,3855,5
+Tungsten,uncommon,3870,5
+Agricium,uncommon,3885,5
+Torite,uncommon,3900,5
+Hephaestanite,common,4180,6
+Tin,common,4195,6
+Quartz,common,4210,6
+Corundum,common,4225,6
+Copper,common,4240,6
+Silicon,common,4255,6
+Iron,common,4270,6
+Aluminium,common,4285,6
+Ice,common,4300,6
+ROC Mineables,ROC Mineables,4000,7
+FPS Mineables,FPS Mineables,3000,10
+Salvage,Salvage,2000,15
