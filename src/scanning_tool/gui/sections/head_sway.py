@@ -11,8 +11,11 @@ from tkinter import ttk
 from scanning_tool.anchor import AnchorRegionTracker, perform_auto_alignment
 from scanning_tool.config import ensure_anchor_directory
 from scanning_tool.gui.sections.base import SectionContext
-from scanning_tool.gui.theme import style_spinbox
-from scanning_tool.gui.widgets import create_glass_scale
+from scanning_tool.gui.widgets import (
+    create_button_row,
+    create_glass_scale,
+    create_labeled_spinbox,
+)
 from scanning_tool.gui.overlays import (
     hide_anchor_overlay,
     register_anchor_sliders,
@@ -58,32 +61,33 @@ class HeadSwaySection:
         return frame
 
     def _build_interval_row(self, parent: ttk.Widget, ctx: SectionContext) -> None:
-        row = ttk.Frame(parent, style="Glass.Section.TFrame")
-        row.pack(fill="x", padx=5, pady=(0, 5))
-        ttk.Label(row, text="Alignment interval (ms)", style="Glass.Small.TLabel").pack(side="left")
-
         self._interval_var = tk.IntVar(value=int(app_state.settings.anchor.alignment_poll_interval_ms))
-        spin = tk.Spinbox(
-            row, from_=100, to=5000, increment=50,
-            textvariable=self._interval_var, width=6,
+        create_labeled_spinbox(
+            parent,
+            text="Alignment interval (ms)",
+            variable=self._interval_var,
+            from_=100,
+            to=5000,
+            increment=50,
+            width=6,
             command=self._update_alignment_interval,
+            colors=ctx.colors,
         )
-        spin.pack(side="left", padx=5)
-        style_spinbox(spin, ctx.colors)
         self._interval_var.trace_add("write", self._update_alignment_interval)
 
     def _build_threshold_row(self, parent: ttk.Widget, ctx: SectionContext) -> None:
-        row = ttk.Frame(parent, style="Glass.Section.TFrame")
-        row.pack(fill="x", padx=5, pady=5)
-        ttk.Label(row, text="Detection threshold", style="Glass.Small.TLabel").pack(side="left")
-
         self._threshold_var = tk.DoubleVar(value=app_state.settings.anchor.anchor_threshold)
-        spin = tk.Spinbox(
-            row, from_=0.10, to=0.99, increment=0.01,
-            textvariable=self._threshold_var, width=6, command=self._update_threshold,
+        create_labeled_spinbox(
+            parent,
+            text="Detection threshold",
+            variable=self._threshold_var,
+            from_=0.10,
+            to=0.99,
+            increment=0.01,
+            width=6,
+            command=self._update_threshold,
+            colors=ctx.colors,
         )
-        spin.pack(side="left", padx=5)
-        style_spinbox(spin, ctx.colors)
         self._threshold_var.trace_add("write", self._update_threshold)
 
     def _build_region_sliders(self, parent: ttk.Widget) -> None:
@@ -123,16 +127,14 @@ class HeadSwaySection:
         sync_anchor_sliders()
 
     def _build_action_buttons(self, parent: ttk.Widget) -> None:
-        row = ttk.Frame(parent, style="Glass.Section.TFrame")
-        row.pack(fill="x", padx=5, pady=5)
-        for label, command in (
-            ("Reload Templates", self._reload_anchor_templates),
-            ("Realign Now", self._manual_realign),
-            ("Open Template Folder", self._open_anchor_directory),
-        ):
-            ttk.Button(row, text=label, command=command, style="Glass.TButton").pack(
-                side="left", padx=5
-            )
+        create_button_row(
+            parent,
+            [
+                ("Reload Templates", self._reload_anchor_templates),
+                ("Realign Now", self._manual_realign),
+                ("Open Template Folder", self._open_anchor_directory),
+            ],
+        )
 
     def _on_region_change(self, *_args: object) -> None:
         if app_state.control_state.gui_control_state["syncing"]["anchor"]:

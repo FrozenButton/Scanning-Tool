@@ -84,6 +84,56 @@ def create_glass_scale(
     return scale
 
 
+def create_section_row(parent: ttk.Widget, pady: Tuple[int, int] = (0, 5)) -> ttk.Frame:
+    """Create a styled row container for section controls."""
+    row = ttk.Frame(parent, style="Glass.Section.TFrame")
+    row.pack(fill="x", padx=5, pady=pady)
+    return row
+
+
+def create_labeled_spinbox(
+    parent: ttk.Widget,
+    text: str,
+    variable: tk.Variable,
+    from_: float,
+    to: float,
+    increment: float,
+    width: int,
+    command: Optional[Callable[[object], None]],
+    colors: GlassPalette,
+) -> tk.Spinbox:
+    """Create a labeled spinbox row with custom glass styling."""
+    row = create_section_row(parent)
+    ttk.Label(row, text=text, style="Glass.Small.TLabel").pack(side="left")
+
+    spinbox = tk.Spinbox(
+        row,
+        from_=from_,
+        to=to,
+        increment=increment,
+        textvariable=variable,
+        width=width,
+        command=command,
+    )
+    spinbox.pack(side="left", padx=5)
+    from scanning_tool.gui.theme import style_spinbox
+    style_spinbox(spinbox, colors)
+
+    return spinbox
+
+
+def create_button_row(
+    parent: ttk.Widget,
+    buttons: list[tuple[str, Callable[[], None]]],
+    style: str = "Glass.TButton",
+) -> ttk.Frame:
+    """Create a row of buttons with equal spacing."""
+    row = create_section_row(parent)
+    for label, command in buttons:
+        ttk.Button(row, text=label, command=command, style=style).pack(side="left", padx=5)
+    return row
+
+
 class ScrollableFrame:
     """A vertically scrollable container with a glass background.
 
