@@ -3,6 +3,8 @@
 from scanning_tool.gui.sections.base import Section, SectionContext
 from scanning_tool.gui.sections.capture_region import CaptureRegionSection
 from scanning_tool.gui.sections.controls import ControlsSection
+from scanning_tool.gui.sections.head_sway import HeadSwaySection
+from scanning_tool.gui.sections.ollama import OllamaSection
 from scanning_tool.gui.sections.result_display import ResultDisplaySection
 
 __all__ = [
@@ -10,5 +12,7 @@ __all__ = [
     "SectionContext",
     "CaptureRegionSection",
     "ControlsSection",
+    "HeadSwaySection",
+    "OllamaSection",
     "ResultDisplaySection",
 ]

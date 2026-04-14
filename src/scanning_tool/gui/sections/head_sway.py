@@ -1,0 +1,240 @@
+"""Head Sway Compensation section — anchor tracking and auto-alignment."""
+
+import logging
+import os
+import subprocess
+import sys
+
+import tkinter as tk
+from tkinter import ttk
+
+from scanning_tool.anchor import AnchorRegionTracker, perform_auto_alignment
+from scanning_tool.config import ensure_anchor_directory
+from scanning_tool.gui.sections.base import SectionContext
+from scanning_tool.gui.theme import style_spinbox
+from scanning_tool.gui.widgets import create_glass_scale
+from scanning_tool.overlay import (
+    hide_anchor_overlay,
+    register_anchor_sliders,
+    show_anchor_overlay,
+    sync_anchor_sliders,
+    update_anchor_overlay_region,
+)
+from scanning_tool.state import app_state
+
+logger = logging.getLogger("scanning_tool")
+
+
+class HeadSwaySection:
+    """Anchor region + offset sliders, threshold, and alignment controls."""
+
+    def build(self, parent: ttk.Widget, ctx: SectionContext) -> ttk.LabelFrame:
+        frame = ttk.LabelFrame(
+            parent, text="Head Sway Compensation", style="Glass.TLabelframe"
+        )
+        frame.pack(fill="x", padx=5, pady=8)
+
+        self._status = ctx.status
+
+        self._auto_align_var = tk.BooleanVar(value=app_state.auto_align_enabled)
+        ttk.Checkbutton(
+            frame, text="Enable auto alignment",
+            variable=self._auto_align_var, command=self._toggle_auto_align,
+            style="Glass.TCheckbutton",
+        ).pack(anchor="w", padx=5, pady=(5, 0))
+
+        self._anchor_overlay_var = tk.BooleanVar(value=app_state.anchor_overlay_visible)
+        ttk.Checkbutton(
+            frame, text="Show anchor overlay",
+            variable=self._anchor_overlay_var, command=self._toggle_anchor_overlay_visibility,
+            style="Glass.TCheckbutton",
+        ).pack(anchor="w", padx=5, pady=(0, 5))
+
+        self._build_interval_row(frame, ctx)
+        self._build_threshold_row(frame, ctx)
+        self._build_region_sliders(frame)
+        self._build_action_buttons(frame)
+
+        return frame
+
+    def _build_interval_row(self, parent: ttk.Widget, ctx: SectionContext) -> None:
+        row = ttk.Frame(parent, style="Glass.Section.TFrame")
+        row.pack(fill="x", padx=5, pady=(0, 5))
+        ttk.Label(row, text="Alignment interval (ms)", style="Glass.Small.TLabel").pack(side="left")
+
+        self._interval_var = tk.IntVar(value=int(app_state.alignment_poll_interval_ms))
+        spin = tk.Spinbox(
+            row, from_=100, to=5000, increment=50,
+            textvariable=self._interval_var, width=6,
+            command=self._update_alignment_interval,
+        )
+        spin.pack(side="left", padx=5)
+        style_spinbox(spin, ctx.colors)
+        self._interval_var.trace_add("write", self._update_alignment_interval)
+
+    def _build_threshold_row(self, parent: ttk.Widget, ctx: SectionContext) -> None:
+        row = ttk.Frame(parent, style="Glass.Section.TFrame")
+        row.pack(fill="x", padx=5, pady=5)
+        ttk.Label(row, text="Detection threshold", style="Glass.Small.TLabel").pack(side="left")
+
+        self._threshold_var = tk.DoubleVar(value=app_state.anchor_threshold)
+        spin = tk.Spinbox(
+            row, from_=0.10, to=0.99, increment=0.01,
+            textvariable=self._threshold_var, width=6, command=self._update_threshold,
+        )
+        spin.pack(side="left", padx=5)
+        style_spinbox(spin, ctx.colors)
+        self._threshold_var.trace_add("write", self._update_threshold)
+
+    def _build_region_sliders(self, parent: ttk.Widget) -> None:
+        self._anchor_left = create_glass_scale(
+            parent, text="Anchor Left", minimum=0, maximum=3840,
+            initial=app_state.anchor_region["left"], command=self._on_region_change,
+        )
+        self._anchor_top = create_glass_scale(
+            parent, text="Anchor Top", minimum=0, maximum=2160,
+            initial=app_state.anchor_region["top"], command=self._on_region_change,
+        )
+        self._anchor_width = create_glass_scale(
+            parent, text="Anchor Width", minimum=50, maximum=1200,
+            initial=app_state.anchor_region["width"], command=self._on_region_change,
+        )
+        self._anchor_height = create_glass_scale(
+            parent, text="Anchor Height", minimum=50, maximum=800,
+            initial=app_state.anchor_region["height"], command=self._on_region_change,
+        )
+        self._offset_x = create_glass_scale(
+            parent, text="Offset X", minimum=-300, maximum=600,
+            initial=app_state.anchor_offset["x"], command=self._on_offset_change,
+        )
+        self._offset_y = create_glass_scale(
+            parent, text="Offset Y", minimum=-300, maximum=600,
+            initial=app_state.anchor_offset["y"], command=self._on_offset_change,
+            padding=(0, 0),
+        )
+
+        register_anchor_sliders(
+            self._anchor_left, self._anchor_top, self._anchor_width, self._anchor_height,
+            self._offset_x, self._offset_y,
+        )
+        sync_anchor_sliders()
+
+    def _build_action_buttons(self, parent: ttk.Widget) -> None:
+        row = ttk.Frame(parent, style="Glass.Section.TFrame")
+        row.pack(fill="x", padx=5, pady=5)
+        for label, command in (
+            ("Reload Templates", self._reload_anchor_templates),
+            ("Realign Now", self._manual_realign),
+            ("Open Template Folder", self._open_anchor_directory),
+        ):
+            ttk.Button(row, text=label, command=command, style="Glass.TButton").pack(
+                side="left", padx=5
+            )
+
+    def _on_region_change(self, *_args: object) -> None:
+        if app_state.gui_control_state["syncing"]["anchor"]:
+            return
+        app_state.anchor_region["left"] = int(self._anchor_left.get())
+        app_state.anchor_region["top"] = int(self._anchor_top.get())
+        app_state.anchor_region["width"] = int(self._anchor_width.get())
+        app_state.anchor_region["height"] = int(self._anchor_height.get())
+        self._status.set_anchor(
+            f"Anchor region updated: {app_state.anchor_region}", hold=2.0
+        )
+        if app_state.auto_align_enabled:
+            perform_auto_alignment()
+        update_anchor_overlay_region()
+
+    def _on_offset_change(self, *_args: object) -> None:
+        if app_state.gui_control_state["syncing"]["anchor"]:
+            return
+        app_state.anchor_offset["x"] = int(self._offset_x.get())
+        app_state.anchor_offset["y"] = int(self._offset_y.get())
+        self._status.set_anchor(
+            f"Anchor offset updated: {app_state.anchor_offset}", hold=2.0
+        )
+        if app_state.auto_align_enabled:
+            perform_auto_alignment()
+
+    def _toggle_auto_align(self) -> None:
+        app_state.auto_align_enabled = self._auto_align_var.get()
+        app_state.last_alignment_info["enabled"] = app_state.auto_align_enabled
+        if app_state.auto_align_enabled:
+            self._status.set_anchor("Head sway compensation enabled.")
+            perform_auto_alignment()
+        else:
+            self._status.set_anchor("Head sway compensation disabled.")
+
+    def _toggle_anchor_overlay_visibility(self) -> None:
+        app_state.anchor_overlay_visible = self._anchor_overlay_var.get()
+        if app_state.anchor_overlay_visible:
+            show_anchor_overlay()
+            self._status.set_anchor("Anchor overlay shown.")
+        else:
+            hide_anchor_overlay()
+            self._status.set_anchor("Anchor overlay hidden.")
+
+    def _update_alignment_interval(self, *_args: object) -> None:
+        try:
+            value = int(self._interval_var.get())
+        except (tk.TclError, ValueError):
+            return
+        value = max(100, min(5000, value))
+        app_state.alignment_poll_interval_ms = value
+        self._status.set_anchor(
+            f"Alignment interval set to {app_state.alignment_poll_interval_ms} ms", hold=2.0
+        )
+
+    def _update_threshold(self, *_args: object) -> None:
+        try:
+            value = float(self._threshold_var.get())
+        except (tk.TclError, ValueError):
+            return
+        value = max(0.1, min(0.99, value))
+        app_state.anchor_threshold = value
+        if app_state.anchor_tracker is not None:
+            app_state.anchor_tracker.set_threshold(app_state.anchor_threshold)
+        self._status.set_anchor(
+            f"Anchor detection threshold set to {app_state.anchor_threshold:.2f}"
+        )
+
+    def _reload_anchor_templates(self) -> None:
+        ensure_anchor_directory(app_state.anchor_template_dir)
+        if app_state.anchor_tracker is None:
+            app_state.anchor_tracker = AnchorRegionTracker(
+                app_state.anchor_template_dir, app_state.anchor_threshold
+            )
+        count = app_state.anchor_tracker.set_directory(app_state.anchor_template_dir)
+        self._status.set_anchor(
+            f"Loaded {count} anchor template(s) from {app_state.anchor_template_dir}."
+        )
+
+    def _manual_realign(self) -> None:
+        if perform_auto_alignment():
+            info = app_state.last_alignment_info
+            self._status.set_anchor(
+                f"Anchor locked using {info['template']} (score {info['score']:.2f}).",
+                hold=2.5,
+            )
+            self._status.set_status(
+                f"Auto alignment adjusted CAP_REGION: {app_state.cap_region}"
+            )
+        else:
+            self._status.set_anchor(
+                "Anchor match not found. Adjust search region or add templates."
+            )
+
+    def _open_anchor_directory(self) -> None:
+        path = os.path.abspath(app_state.anchor_template_dir)
+        ensure_anchor_directory(path)
+        try:
+            if sys.platform.startswith("win"):
+                os.startfile(path)  # type: ignore[attr-defined]
+            elif sys.platform.startswith("darwin"):
+                subprocess.Popen(["open", path])
+            else:
+                subprocess.Popen(["xdg-open", path])
+        except Exception as exc:
+            self._status.set_anchor(f"Unable to open template folder: {exc}", hold=3.0)
+        else:
+            self._status.set_anchor(f"Opened template folder: {path}")
