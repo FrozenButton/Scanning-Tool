@@ -14,8 +14,10 @@ from scanning_tool.core.auto_alignment import perform_auto_alignment
 from scanning_tool.gui.overlays import update_capture_overlay_region, update_overlay_label, sync_capture_sliders
 from scanning_tool.runtime.scan_state import LastResult
 
+from scanning_tool.interfaces.services import ICaptureService
 
-class CaptureService:
+
+class CaptureService(ICaptureService):
     """Service for capturing screen regions and processing OCR results."""
     
     def __init__(self):
