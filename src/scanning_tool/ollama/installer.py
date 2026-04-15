@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 import os
 import shutil
 import subprocess
@@ -8,7 +8,6 @@ from typing import Optional
 
 from .host import get_ollama_host, is_local_ollama_host
 
-logger = logging.getLogger(__name__)
 
 
 def show_installation_message(system_name: str) -> None:

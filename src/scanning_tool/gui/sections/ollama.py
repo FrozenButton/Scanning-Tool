@@ -1,6 +1,6 @@
 """Ollama Connection section — model picker, host entry, and action buttons."""
 
-import logging
+from loguru import logger
 import webbrowser
 
 import tkinter as tk
@@ -24,7 +24,6 @@ from scanning_tool.ollama import (
 from scanning_tool.state import app_state
 from scanning_tool.web import get_local_ip
 
-logger = logging.getLogger(__name__)
 
 
 SUGGESTED_MODELS = (

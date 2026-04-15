@@ -1,6 +1,6 @@
 """Anchor template loading and matching."""
 
-import logging
+from loguru import logger
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -10,7 +10,6 @@ import numpy as np
 
 from scanning_tool.config import ensure_anchor_directory
 
-logger = logging.getLogger(__name__)
 
 
 class AnchorRegionTracker:

@@ -1,7 +1,7 @@
 """Configuration loader and saver for the scanning tool."""
 
 import json
-import logging
+from loguru import logger
 import os
 import sys
 from pathlib import Path
@@ -12,7 +12,6 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from scanning_tool.config.settings import AppSettings
 from scanning_tool.state.context import AppContext
 
-logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 CONFIG_FILE = PROJECT_ROOT / "config.json"

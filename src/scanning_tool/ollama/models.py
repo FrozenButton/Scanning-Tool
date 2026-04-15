@@ -1,11 +1,10 @@
-import logging
+from loguru import logger
 import sys
 from typing import List, Optional
 
 from .client import get_ollama_client
 from .host import get_ollama_host, get_ollama_model, is_local_ollama_host
 
-logger = logging.getLogger(__name__)
 
 
 def ensure_model_installed(model: Optional[str] = None, exit_on_error: bool = True) -> bool:

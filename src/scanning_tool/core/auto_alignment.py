@@ -1,13 +1,12 @@
 """Auto alignment service for anchor-based capture region correction."""
 
-import logging
+from loguru import logger
 from typing import Callable, Dict, Optional
 
 from scanning_tool.core.anchor import AnchorRegionTracker
 from scanning_tool.config.settings import AnchorSettings, CaptureSettings
 from scanning_tool.runtime.scan_state import AlignmentInfo
 
-logger = logging.getLogger(__name__)
 
 
 SyncCallback = Callable[[], None]

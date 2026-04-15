@@ -1,6 +1,6 @@
 """Main entry point - startup orchestration."""
 
-import logging
+from loguru import logger
 from threading import Thread
 
 from threading import Thread
@@ -23,7 +23,7 @@ from scanning_tool.web import create_app, get_local_ip
 
 def main() -> None:
     """Launch the scanning tool."""
-    logger = setup_logging()
+    setup_logging()
 
     load_config(app_state)
     load_rock_data()

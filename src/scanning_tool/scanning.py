@@ -1,6 +1,7 @@
 """Screen capture and scanning logic."""
 
-import logging
+from loguru import logger
+import re
 import time
 from threading import Thread
 
@@ -14,11 +15,14 @@ from scanning_tool.core.auto_alignment import perform_auto_alignment
 from scanning_tool.gui.overlays import update_capture_overlay_region, update_overlay_label, sync_capture_sliders
 from scanning_tool.runtime.scan_state import LastResult
 
-logger = logging.getLogger(__name__)
 
 
 def capture_once() -> None:
     """Capture one scan from the capture region and update overlay. Accepts optional status_callback for UI feedback."""
+    def highlight_numbers(text: str) -> str:
+        # Wrap numbers in <yellow> tags for loguru
+        return re.sub(r"(\d+)", r"<yellow>\1</yellow>", text)
+
     def _do_capture(status_callback=None):
         if status_callback:
             status_callback("Aligning region...")
@@ -51,7 +55,17 @@ def capture_once() -> None:
             info = lookup_deposit(code)
             app_state.scan_state.last_result = LastResult(code=code, code_raw=raw, info=info, raw_text=raw_text)
             update_overlay_label(info, code=code, raw_text=raw or raw_text)
-            logger.info(f"Scan result: {app_state.scan_state.last_result}")
+            # Highlight only numbers in the log message using <yellow> tags
+            result = app_state.scan_state.last_result
+            logger.info(
+                f"Scan result: LastResult("
+                f"code={result.code}, "
+                f"code_raw={result.code_raw}, "
+                f"info={result.info}, "
+                f"confidence={result.confidence}, "
+                f"raw_text={result.raw_text}"
+                ")"
+            )
             if status_callback:
                 status_callback("Scan complete.")
         except Exception as e:

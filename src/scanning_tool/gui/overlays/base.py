@@ -1,11 +1,10 @@
 """Common overlay utilities and Tk helper functions."""
 
-import logging
+from loguru import logger
 from typing import Callable, Optional, TypeVar
 
 import tkinter as tk
 
-logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
 TOPMOST_INTERVAL_MS = 1500

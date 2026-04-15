@@ -1,14 +1,13 @@
 """Deposit lookup tables, ore tiers, and multiplier code logic."""
 
 import json
-import logging
+from loguru import logger
 import re
 from typing import Any, Dict, List, Optional
 
 from scanning_tool.config import ROCK_TYPE_FILE
 from scanning_tool.state import app_state
 
-logger = logging.getLogger(__name__)
 
 
 # --- Dynamic scan signature table ---
