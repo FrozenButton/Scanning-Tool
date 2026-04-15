@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 # --- Dynamic scan signature table ---
-import csv
+import pandas as pd
 from pathlib import Path
 
 # Path to the summary CSV (relative to project root)
@@ -20,9 +20,9 @@ SCAN_SIG_CSV = Path(__file__).parent.parent.parent / "csv" / "scansig" / "scan_s
 
 SCAN_SIGNATURES = {}
 if SCAN_SIG_CSV.exists():
-    with open(SCAN_SIG_CSV, encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
+    try:
+        df = pd.read_csv(SCAN_SIG_CSV)
+        for _, row in df.iterrows():
             try:
                 base_value = int(row["base_value"])
                 max_multiplier = int(row["max_multiplier"])
@@ -36,6 +36,8 @@ if SCAN_SIG_CSV.exists():
                 }
             except Exception as e:
                 logger.warning(f"Bad scan signature row: {row} ({e})")
+    except Exception as e:
+        logger.warning(f"Failed to load scan signature CSV: {e}")
 else:
     logger.warning(f"Scan signature CSV not found: {SCAN_SIG_CSV}")
 

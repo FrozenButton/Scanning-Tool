@@ -1,4 +1,4 @@
-import csv
+import pandas as pd
 from pathlib import Path
 from typing import List, Dict, Any
 
@@ -7,16 +7,12 @@ def find_signature_matches(signature_value: int, csv_path: str) -> List[Dict[str
     Find all rows in the scan_signatures.csv file that match the given value.
     Returns a list of dicts for each match.
     """
-    matches = []
-    with open(csv_path, newline='', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            try:
-                if int(row['value']) == signature_value:
-                    matches.append(row)
-            except (ValueError, KeyError):
-                continue
-    return matches
+    try:
+        df = pd.read_csv(csv_path)
+        matches = df[df['value'] == signature_value]
+        return matches.to_dict(orient='records')
+    except Exception:
+        return []
 
 if __name__ == "__main__":
     # Example usage
