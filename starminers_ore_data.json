@@ -1,0 +1,642 @@
+{
+    "source": "https://starminersdepot.com/oredata",
+    "script_source": "https://starminersdepot.com/oredata.js",
+    "game_version": "4.8",
+    "fetched_at": "2026-07-19",
+    "ores": [
+        {
+            "name": "Quantanium",
+            "c": "#EF9F27",
+            "p": 151034,
+            "t": "S",
+            "ty": [
+                "ship"
+            ],
+            "v": true,
+            "rs": 3170,
+            "craft": "Quantum fuel components",
+            "n": "Volatile \u2014 refine within 15 min",
+            "l": [
+                "Aaron Halo [C]",
+                "Yela Belt [C]",
+                "Lyria [C]",
+                "Magda [C]",
+                "Ita [?]",
+                "Daymar [?]"
+            ]
+        },
+        {
+            "name": "Stileron",
+            "c": "#D4537E",
+            "p": 139535,
+            "t": "S",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3185,
+            "craft": "High-end ship components",
+            "n": "Pyro system only \u2014 rare",
+            "l": [
+                "Pyro Belt [C]",
+                "Bloom [C]",
+                "Vuur [?]"
+            ]
+        },
+        {
+            "name": "Bexalite",
+            "c": "#5DCAA5",
+            "p": 29150,
+            "t": "S",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3600,
+            "craft": "Advanced manufacturing",
+            "n": "Rare \u2014 belts and caves",
+            "l": [
+                "Aaron Halo [C]",
+                "Yela Belt [C]",
+                "Daymar [C]",
+                "Wala [C]",
+                "Lyria [?]",
+                "Delamar [?]"
+            ]
+        },
+        {
+            "name": "Savrilium",
+            "c": "#a070e0",
+            "p": 0,
+            "t": "A",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3200,
+            "craft": "Alloys & armour (P8-AR)",
+            "n": "Nyx \u2014 Keeger Belt best quality",
+            "l": [
+                "Nyx \u2014 Keeger Belt [C]",
+                "Pyro Belt [C]",
+                "Delamar [?]"
+            ]
+        },
+        {
+            "name": "Ouratite",
+            "c": "#f0c060",
+            "p": 0,
+            "t": "A",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3370,
+            "craft": "Being researched",
+            "n": "New 4.8 \u2014 being mapped",
+            "l": [
+                "Aaron Halo [?]",
+                "Pyro Belt [?]"
+            ]
+        },
+        {
+            "name": "Riccite",
+            "c": "#7F77DD",
+            "p": 70902,
+            "t": "A",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3385,
+            "craft": "High-value industrial",
+            "n": "Pyro system",
+            "l": [
+                "Pyro Belt [C]",
+                "Vuur [C]",
+                "Bloom [?]"
+            ]
+        },
+        {
+            "name": "Lindinium",
+            "c": "#e08060",
+            "p": 0,
+            "t": "A",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3400,
+            "craft": "Weapons \u2014 Pulverizer LMG",
+            "n": "Key crafting ore 4.8",
+            "l": [
+                "CRU-L1 area [C]",
+                "Daymar [C]",
+                "Pyro Belt [C]",
+                "Aaron Halo [?]"
+            ]
+        },
+        {
+            "name": "Beryl",
+            "c": "#97C459",
+            "p": 19810,
+            "t": "A",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3540,
+            "craft": "Weapons \u2014 Gallant Rifle",
+            "n": "Excellent for MOLE runs",
+            "l": [
+                "Aaron Halo [C]",
+                "Yela Belt [C]",
+                "Lyria [C]",
+                "Wala [C]",
+                "Daymar [C]",
+                "Arial [C]",
+                "Delamar [?]"
+            ]
+        },
+        {
+            "name": "Taranite",
+            "c": "#534AB7",
+            "p": 25600,
+            "t": "A",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3555,
+            "craft": "Durable alloys, ship hull",
+            "n": "Found in most belts and many moons",
+            "l": [
+                "Aaron Halo [C]",
+                "Yela Belt [C]",
+                "Calliope [C]",
+                "Clio [C]",
+                "Euterpe [C]",
+                "Daymar [C]",
+                "Wala [C]",
+                "Lyria [?]",
+                "Delamar [?]"
+            ]
+        },
+        {
+            "name": "Borase",
+            "c": "#B4B2A9",
+            "p": 27250,
+            "t": "A",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3570,
+            "craft": "High-grade industrial",
+            "n": "Added 4.6 \u2014 12 refineries",
+            "l": [
+                "Aaron Halo [C]",
+                "Hurston Moons [C]",
+                "Yela Belt [C]",
+                "Wala [?]"
+            ]
+        },
+        {
+            "name": "Gold",
+            "c": "#FAC775",
+            "p": 30222,
+            "t": "A",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3585,
+            "craft": "Electronics, optics",
+            "n": "Stable \u2014 17 refineries. Very widespread",
+            "l": [
+                "Aaron Halo [C]",
+                "Yela Belt [C]",
+                "Daymar [C]",
+                "Aberdeen [C]",
+                "Wala [C]",
+                "Lyria [C]",
+                "Delamar [C]",
+                "CRU-L1 area [C]"
+            ]
+        },
+        {
+            "name": "Laranite",
+            "c": "#185FA5",
+            "p": 8929,
+            "t": "A",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3825,
+            "craft": "Tech manufacturing, armour",
+            "n": "17 refineries \u2014 widest support",
+            "l": [
+                "Calliope [C]",
+                "Clio [C]",
+                "Euterpe [C]",
+                "Daymar [C]",
+                "Wala [C]",
+                "Lyria [C]",
+                "Delamar [C]",
+                "Arial [?]"
+            ]
+        },
+        {
+            "name": "Agricium",
+            "c": "#639922",
+            "p": 9831,
+            "t": "A",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3885,
+            "craft": "Agricultural machinery",
+            "n": "Steady income \u2014 13 refineries",
+            "l": [
+                "Calliope [C]",
+                "Clio [C]",
+                "Euterpe [C]",
+                "Daymar [C]",
+                "Wala [C]",
+                "Arial [?]",
+                "Ita [?]"
+            ]
+        },
+        {
+            "name": "Cobalt",
+            "c": "#378ADD",
+            "p": 21091,
+            "t": "A",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": null,
+            "craft": "High-grade alloys",
+            "n": "Added 4.5 \u2014 Pyro and Nyx",
+            "l": [
+                "Pyro Belt [C]",
+                "Nyx Belt [C]",
+                "Bloom [?]"
+            ]
+        },
+        {
+            "name": "Aslarite",
+            "c": "#c0a060",
+            "p": 0,
+            "t": "B",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3840,
+            "craft": "Being researched",
+            "n": "New 4.8 \u2014 being mapped",
+            "l": [
+                "Aaron Halo [?]",
+                "Pyro Belt [?]"
+            ]
+        },
+        {
+            "name": "Titanium",
+            "c": "#D3D1C7",
+            "p": 8225,
+            "t": "B",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3855,
+            "craft": "Structural components, armour",
+            "n": "Very widespread \u2014 common on all moons",
+            "l": [
+                "Hurston Moons [C]",
+                "Daymar [C]",
+                "Aberdeen [C]",
+                "Wala [C]",
+                "Ita [C]",
+                "Magda [C]",
+                "Calliope [C]",
+                "Clio [C]",
+                "Euterpe [C]",
+                "Arial [C]",
+                "Lyria [C]"
+            ]
+        },
+        {
+            "name": "Tungsten",
+            "c": "#888780",
+            "p": 10417,
+            "t": "B",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3870,
+            "craft": "Industrial parts, weapons",
+            "n": "Added 4.4 \u2014 industrial zones",
+            "l": [
+                "Hurston Moons [C]",
+                "Aberdeen [C]",
+                "Aaron Halo [C]",
+                "Ita [C]",
+                "Magda [C]",
+                "Delamar [?]",
+                "Arial [?]"
+            ]
+        },
+        {
+            "name": "Torite",
+            "c": "#90a080",
+            "p": 0,
+            "t": "B",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 3900,
+            "craft": "Being researched",
+            "n": "New 4.8 \u2014 being mapped",
+            "l": [
+                "Aaron Halo [?]",
+                "Hurston Moons [?]"
+            ]
+        },
+        {
+            "name": "Hephaestanite",
+            "c": "#D85A30",
+            "p": 4690,
+            "t": "B",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 4180,
+            "craft": "Weapons \u2014 Pulverizer LMG",
+            "n": "Key crafting ore \u2014 very common on Aberdeen",
+            "l": [
+                "Daymar [C]",
+                "Aberdeen [C]",
+                "Ita [C]",
+                "Magda [C]",
+                "Hurston Moons [C]",
+                "Arial [C]",
+                "Wala [?]"
+            ]
+        },
+        {
+            "name": "Diamond",
+            "c": "#E6F1FB",
+            "p": 7726,
+            "t": "B",
+            "ty": [
+                "ship",
+                "fps"
+            ],
+            "v": false,
+            "rs": null,
+            "craft": "Optics, precision tools",
+            "n": "Ship mining & cave deposits",
+            "l": [
+                "Aaron Halo [C]",
+                "Yela Belt [C]",
+                "Daymar caves [C]",
+                "Lyria caves [C]",
+                "Wala caves [C]",
+                "Calliope caves [C]",
+                "Aberdeen caves [?]"
+            ]
+        },
+        {
+            "name": "Tin",
+            "c": "#9FE1CB",
+            "p": 3990,
+            "t": "C",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 4195,
+            "craft": "Basic components",
+            "n": "Added 4.1 \u2014 limited refineries",
+            "l": [
+                "Hurston Moons [C]",
+                "Aberdeen [C]",
+                "Ita [C]",
+                "Magda [?]"
+            ]
+        },
+        {
+            "name": "Quartz",
+            "c": "#B5D4F4",
+            "p": 4507,
+            "t": "C",
+            "ty": [
+                "ship",
+                "fps"
+            ],
+            "v": false,
+            "rs": 4210,
+            "craft": "Electronics, sensors",
+            "n": "Extremely abundant everywhere",
+            "l": [
+                "Aaron Halo [C]",
+                "Yela Belt [C]",
+                "Lyria [C]",
+                "Daymar [C]",
+                "Wala [C]",
+                "Calliope [C]",
+                "Hurston Moons [C]",
+                "Delamar [C]",
+                "Aberdeen [C]"
+            ]
+        },
+        {
+            "name": "Corundum",
+            "c": "#F5C4B3",
+            "p": 1800,
+            "t": "C",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 4225,
+            "craft": "Abrasives, optical components",
+            "n": "Often found alongside Beryl",
+            "l": [
+                "Lyria [C]",
+                "Wala [C]",
+                "Aaron Halo [C]",
+                "Yela Belt [C]",
+                "Daymar [C]",
+                "Arial [C]",
+                "Delamar [?]"
+            ]
+        },
+        {
+            "name": "Copper",
+            "c": "#c87040",
+            "p": 3904,
+            "t": "C",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 4240,
+            "craft": "Electronics, wiring, weapons",
+            "n": "Sells raw (1,200) or refined. Widespread",
+            "l": [
+                "Hurston Moons [C]",
+                "Daymar [C]",
+                "Lyria [C]",
+                "Wala [C]",
+                "Aberdeen [C]",
+                "Ita [C]",
+                "Magda [C]",
+                "Delamar [C]",
+                "CRU-L1 area [C]"
+            ]
+        },
+        {
+            "name": "Silicon",
+            "c": "#a0c0d0",
+            "p": 0,
+            "t": "C",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 4255,
+            "craft": "Electronics (key crafting base)",
+            "n": "New 4.8 \u2014 being mapped",
+            "l": [
+                "Aaron Halo [?]",
+                "Yela Belt [?]",
+                "Being mapped by community"
+            ]
+        },
+        {
+            "name": "Iron",
+            "c": "#5F5E5A",
+            "p": 2400,
+            "t": "C",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 4270,
+            "craft": "Structural, weapons",
+            "n": "Ubiquitous \u2014 CRU-L1 easiest source",
+            "l": [
+                "CRU-L1 area [C]",
+                "Aaron Halo [C]",
+                "Yela Belt [C]",
+                "Hurston Moons [C]",
+                "Daymar [C]",
+                "Wala [C]",
+                "Lyria [C]",
+                "Aberdeen [C]",
+                "Delamar [C]",
+                "Most asteroid fields [C]"
+            ]
+        },
+        {
+            "name": "Aluminum",
+            "c": "#C0DD97",
+            "p": 3820,
+            "t": "C",
+            "ty": [
+                "ship"
+            ],
+            "v": false,
+            "rs": 4285,
+            "craft": "Structures, consumables",
+            "n": "Very common filler \u2014 use for consumables",
+            "l": [
+                "Aaron Halo [C]",
+                "Yela Belt [C]",
+                "Hurston Moons [C]",
+                "Daymar [C]",
+                "Wala [C]",
+                "Lyria [C]",
+                "Delamar [C]",
+                "Aberdeen [C]",
+                "Most fields [C]"
+            ]
+        },
+        {
+            "name": "Hadanite",
+            "c": "#FAC775",
+            "p": 275,
+            "t": "A",
+            "ty": [
+                "roc",
+                "fps"
+            ],
+            "v": false,
+            "rs": null,
+            "craft": "Gems \u2014 decorative & industrial",
+            "n": "275 aUEC/unit. Aberdeen best \u2014 densest clusters",
+            "l": [
+                "Aberdeen [C]",
+                "Daymar [C]",
+                "Arial [C]",
+                "Magda [C]",
+                "Ita [C]",
+                "Aaron Halo FPS [?]"
+            ]
+        },
+        {
+            "name": "Aphorite",
+            "c": "#9FE1CB",
+            "p": 152,
+            "t": "B",
+            "ty": [
+                "roc",
+                "fps"
+            ],
+            "v": false,
+            "rs": null,
+            "craft": "Oscillators, precision parts",
+            "n": "152 aUEC/unit \u2014 often with Hadanite",
+            "l": [
+                "Aberdeen [C]",
+                "Daymar [C]",
+                "Arial [C]",
+                "Magda [C]",
+                "Ita [C]"
+            ]
+        },
+        {
+            "name": "Dolivine",
+            "c": "#639922",
+            "p": 130,
+            "t": "C",
+            "ty": [
+                "roc",
+                "fps"
+            ],
+            "v": false,
+            "rs": null,
+            "craft": "Decorative, industrial",
+            "n": "130 aUEC/unit \u2014 abundant cave gem",
+            "l": [
+                "Lyria [C]",
+                "Wala [C]",
+                "Yela surface [C]",
+                "Magda [C]",
+                "Ita [C]",
+                "Calliope [C]",
+                "Clio [C]",
+                "Euterpe [C]"
+            ]
+        }
+    ]
+}

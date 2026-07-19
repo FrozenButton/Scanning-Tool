@@ -5,3 +5,4 @@ mss
 flask
 keyboard
 ollama
+rapidocr-onnxruntime

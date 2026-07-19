@@ -7,6 +7,11 @@ This script tests all the major dependencies without launching the full GUI.
 import sys
 import os
 
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except AttributeError:
+    pass
+
 def test_python_version():
     """Test Python version compatibility."""
     print(f"Python version: {sys.version}")
@@ -50,7 +55,8 @@ def test_file_structure():
     required_files = [
         'scan_deposits.py',
         'requirements.txt',
-        'RockTypes_2025-09-16.json',
+        'starminers_ore_data.json',
+        'user_rock_data.json',
         'config.json'  # This might not exist initially, that's OK
     ]
     

@@ -1,0 +1,41 @@
+{
+    "materials": [
+        {
+            "c": "#8fd7ff",
+            "craft": "User discovered",
+            "l": [
+                "User discovered"
+            ],
+            "n": "Observed in game: 17,200 total RS = Raw Ice x4",
+            "name": "Raw Ice",
+            "p": 0,
+            "rs": 4300,
+            "source": "local",
+            "t": "C",
+            "ty": [
+                "ship"
+            ],
+            "v": false
+        },
+        {
+            "c": "#b7c0c7",
+            "craft": "Salvage material",
+            "l": [
+                "User discovered"
+            ],
+            "n": "Observed in game: Metal Panels base RS = 2,000",
+            "name": "Metal Panels",
+            "p": 0,
+            "rs": 2000,
+            "source": "local",
+            "t": "C",
+            "ty": [
+                "salvage"
+            ],
+            "v": false
+        }
+    ],
+    "sightings": [],
+    "STANTON": {},
+    "PYRO": {}
+}

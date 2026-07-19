@@ -7,7 +7,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/FrozenButton/Scanning-Tool)](https://github.com/FrozenButton/Scanning-Tool/issues)
 
 ## What it does
-- Captures the HUD deposit code, reads it with the `qwen2.5vl:3b` model, and shows the deposit type/quantity.
+- Captures the HUD mining scan text, reads it with the `qwen2.5vl:3b` model, and shows ore reference and quality guidance.
 - Locks to a user-selected HUD anchor so the capture box follows head sway and ship movement.
 - Hosts a small web overlay (desktop + mobile friendly) so you can view the latest scan from a browser; a GUI button opens it for you.
 

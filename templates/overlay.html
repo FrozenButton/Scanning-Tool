@@ -34,13 +34,21 @@
       backdrop-filter: blur(2px);
     }
 
+    .hud-layout {
+      width: min(920px, 100%);
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(300px, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
     .hud-container {
       position: relative;
-      width: min(420px, 100%);
+      width: 100%;
       padding: 18px 22px 24px;
       background: var(--hud-bg);
       border: 1px solid var(--hud-border);
-      border-radius: 18px;
+      border-radius: 8px;
       box-shadow: 0 16px 45px var(--hud-shadow), inset 0 0 35px rgba(108, 208, 255, 0.08);
       backdrop-filter: blur(22px) saturate(160%);
       overflow: hidden;
@@ -142,6 +150,11 @@
       box-shadow: 0 0 14px rgba(94, 229, 255, 0.55);
     }
 
+    .toggle-pill input:focus-visible + span {
+      outline: 2px solid var(--hud-accent);
+      outline-offset: 2px;
+    }
+
     .legend {
       margin-top: 12px;
       display: flex;
@@ -159,6 +172,19 @@
       font-weight: 600;
       color: #02131f;
       box-shadow: 0 0 10px rgba(94, 229, 255, 0.25);
+      background: rgba(94, 229, 255, 0.8);
+    }
+
+    .tag {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(255, 104, 82, 0.22);
+      border: 1px solid rgba(255, 104, 82, 0.55);
+      color: #ffb3a8;
+      font-size: 10px;
+      letter-spacing: 0.8px;
     }
 
     .hud-empty {
@@ -181,6 +207,115 @@
       letter-spacing: 0.6px;
       color: var(--hud-muted);
       text-align: center;
+    }
+
+    .data-panel h2 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--hud-accent);
+      text-shadow: 0 0 10px rgba(94, 229, 255, 0.45);
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: var(--hud-muted);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 36px;
+      border: 1px solid rgba(94, 229, 255, 0.26);
+      border-radius: 6px;
+      background: rgba(5, 18, 36, 0.78);
+      color: var(--hud-text);
+      padding: 8px 10px;
+      font: inherit;
+      outline: none;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: rgba(94, 229, 255, 0.8);
+      box-shadow: 0 0 0 2px rgba(94, 229, 255, 0.18);
+    }
+
+    .save-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .save-row button {
+      min-height: 36px;
+      border: 1px solid rgba(94, 229, 255, 0.55);
+      border-radius: 6px;
+      background: linear-gradient(135deg, rgba(39, 120, 205, 0.82), rgba(94, 229, 255, 0.48));
+      color: var(--hud-text);
+      padding: 8px 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 14px rgba(94, 229, 255, 0.3);
+    }
+
+    .save-row button:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    .form-status {
+      min-height: 16px;
+      font-size: 11px;
+      color: var(--hud-muted);
+    }
+
+    .saved-list {
+      margin-top: 14px;
+      max-height: 240px;
+      overflow: auto;
+      border-top: 1px solid rgba(94, 229, 255, 0.16);
+      padding-top: 10px;
+      font-size: 12px;
+    }
+
+    .saved-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(94, 229, 255, 0.1);
+    }
+
+    .saved-item strong {
+      color: var(--hud-text);
+    }
+
+    .saved-item span {
+      color: var(--hud-muted);
+      text-align: right;
     }
 
     table {
@@ -223,6 +358,20 @@
       color: var(--hud-text);
     }
 
+    td:first-child {
+      color: var(--hud-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-size: 11px;
+      width: 34%;
+    }
+
+    @media (max-width: 760px) {
+      .hud-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 520px) {
       .hud-container {
         padding: 16px;
@@ -240,92 +389,299 @@
       .toggle-group {
         align-self: flex-start;
       }
+
+      .data-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field.full {
+        grid-column: auto;
+      }
     }
     </style>
 </head>
 <body>
 <div class="hud-wrap">
-  <div class="hud-container" id="box">
-    <div class="hud-header">
-      <div>
-        <h1 id="name">No code</h1>
-        <p id="code" class="hud-subtitle"></p>
+  <div class="hud-layout">
+    <div class="hud-container" id="box">
+      <div class="hud-header">
+        <div>
+          <h1 id="name">No code</h1>
+          <p id="code" class="hud-subtitle"></p>
+        </div>
+        <div class="toggle-group">
+          <label class="toggle-pill"><input type="radio" name="region" value="STANTON" checked><span>Stanton</span></label>
+          <label class="toggle-pill"><input type="radio" name="region" value="PYRO"><span>Pyro</span></label>
+        </div>
       </div>
-      <div class="toggle-group">
-        <label class="toggle-pill"><input type="radio" name="region" value="STANTON" checked><span>Stanton</span></label>
-        <label class="toggle-pill"><input type="radio" name="region" value="PYRO"><span>Pyro</span></label>
+      <p id="raw" class="hud-raw"></p>
+      <div class="legend">
+        <span style="background:#E88AFF;">Highest</span>
+        <span style="background:#63E64C;">High</span>
+        <span style="background:#E6E14C;">Medium</span>
+        <span style="background:#E69E4C;">Low</span>
       </div>
+      <div id="minerals" class="hud-table"></div>
+      <p class="hud-note">Tip: open this overlay on another device (phone or tablet) using your local network link.</p>
     </div>
-    <p id="raw" class="hud-raw"></p>
-    <div class="legend">
-      <span style="background:#E88AFF;">Highest</span>
-      <span style="background:#63E64C;">High</span>
-      <span style="background:#E6E14C;">Medium</span>
-      <span style="background:#E69E4C;">Low</span>
+
+    <div class="hud-container data-panel">
+      <h2>Ore Sightings</h2>
+      <form id="materialForm">
+        <div class="data-grid">
+          <div class="field">
+            <label for="entryRegion">System</label>
+            <select id="entryRegion" name="system">
+              <option value="STANTON">Stanton</option>
+              <option value="PYRO">Pyro</option>
+              <option value="NYX">Nyx</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="locationType">Location Type</label>
+            <select id="locationType" name="location_type">
+              <option value="asteroid_belt">Asteroid belt</option>
+              <option value="moon_surface">Moon surface</option>
+              <option value="planet_surface">Planet surface</option>
+              <option value="cave">Cave</option>
+              <option value="deep_space">Deep space</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="oreName">Ore</label>
+            <input id="oreName" name="ore_name" list="oreOptions" placeholder="Quantanium" required>
+            <datalist id="oreOptions"></datalist>
+          </div>
+          <div class="field full">
+            <label for="location">Location</label>
+            <input id="location" name="location" placeholder="Yela Belt, Daymar caves" required>
+          </div>
+          <div class="field">
+            <label for="quality">Quality</label>
+            <input id="quality" name="quality" type="number" min="0" max="1000" step="1" placeholder="720">
+          </div>
+          <div class="field">
+            <label for="rs">Base RS</label>
+            <input id="rs" name="rs" type="number" min="1" step="1" placeholder="4300">
+          </div>
+          <div class="field full">
+            <label for="notes">Notes</label>
+            <input id="notes" name="notes" placeholder="Dense cluster, good %">
+          </div>
+        </div>
+        <div class="save-row">
+          <button id="saveMaterial" type="submit">Save</button>
+          <div id="formStatus" class="form-status"></div>
+        </div>
+      </form>
+      <div id="savedList" class="saved-list"></div>
     </div>
-    <div id="minerals" class="hud-table"></div>
-    <p class="hud-note">Tip: open this overlay on another device (phone or tablet) using your local network link.</p>
   </div>
 </div>
 <script>
 let region = "STANTON";
+let oreReference = [];
+let hasRenderedOreMatch = false;
+const form = document.getElementById('materialForm');
+const formStatus = document.getElementById('formStatus');
+const saveButton = document.getElementById('saveMaterial');
+const savedList = document.getElementById('savedList');
+
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[ch]));
+}
+
 document.querySelectorAll('input[name="region"]').forEach(el=>{
   el.addEventListener("change", e=>{
     region = e.target.value;
+    document.getElementById('entryRegion').value = region;
     poll();
   });
 });
 
-function renderTable(data){
-  if(!Array.isArray(data) || !data.length){
-    document.getElementById('minerals').innerHTML = '';
-    return;
-  }
-  let html = '<table><tr><th>Mineral</th><th>Prob</th><th>Min</th><th>Max</th><th>Med</th></tr>';
-  for(const row of data){
-    html += `<tr>
-      <td style="color:${row.color}; font-weight:bold;">${row.name}</td>
-      <td>${row.prob}</td>
-      <td>${row.min}</td>
-      <td>${row.max}</td>
-      <td>${row.med}</td>
-    </tr>`;
-  }
-  html += '</table>';
-  document.getElementById('minerals').innerHTML = html;
+function formatPrice(ore){
+  if(!ore || !ore.price){ return 'Unknown'; }
+  const unit = Array.isArray(ore.types) && ore.types.every(t => t === 'roc' || t === 'fps') ? ' /unit' : ' /SCU';
+  return Number(ore.price).toLocaleString() + unit;
 }
 
-function showEmptyState(category){
-  const message = category && category.toLowerCase().includes('salvage')
-    ? 'No mineral composition available for salvage targets.'
-    : '';
-  document.getElementById('minerals').innerHTML = message
-    ? `<div class="hud-empty">${message}</div>`
-    : '';
+function formatOreTitle(ore){
+  if(!ore){ return ''; }
+  const amount = Number(ore.display_units ?? ore.units ?? 1);
+  return amount > 1 ? `${ore.name} x${amount}` : ore.name;
 }
+
+function renderOreReference(ore, quality, matches = []){
+  if(!ore){
+    document.getElementById('minerals').innerHTML = '<div class="hud-empty">No ore reference match yet. Scan an ore name or RS signature.</div>';
+    return;
+  }
+  const amount = Number(ore.display_units ?? ore.units ?? 1);
+  const totalMultiple = Number(ore.units || 1);
+  const countText = amount > 1
+    ? `${amount} detected`
+    : 'Base signature';
+  const alternatives = Array.isArray(matches) && matches.length > 1
+    ? `<tr><td>Possibilities</td><td>${matches.map(item => `${escapeHtml(item.name)} x${Number(item.display_units ?? item.units ?? 1)}`).join('<br>')}</td></tr>`
+    : '';
+  const locations = Array.isArray(ore.locations) && ore.locations.length
+    ? ore.locations.map(x => `<span>${escapeHtml(x)}</span>`).join('')
+    : '<span>Unknown</span>';
+  const qualityHtml = quality
+    ? `<tr><td>Quality</td><td style="color:${quality.color};font-weight:bold;">${quality.value} - ${escapeHtml(quality.grade)}</td></tr>
+       <tr><td>Recommendation</td><td>${escapeHtml(quality.recommendation)}</td></tr>
+       <tr><td>Craft Outcome</td><td>${escapeHtml(quality.outcome)} (${escapeHtml(quality.bonus)})</td></tr>`
+    : `<tr><td>Quality</td><td>Add a quality score in a local sighting when discovered.</td></tr>`;
+
+  document.getElementById('minerals').innerHTML = `
+    <table>
+      <tr><th colspan="2">Star Miners Depot Ore Reference</th></tr>
+      <tr><td>Ore</td><td style="color:${ore.color};font-weight:bold;">${escapeHtml(formatOreTitle(ore))} ${ore.volatile ? '<span class="tag">VOLATILE</span>' : ''}</td></tr>
+      <tr><td>Scanned RS</td><td>${ore.scan_rs ?? 'Unknown'}</td></tr>
+      <tr><td>Base RS</td><td>${ore.rs ?? 'Unknown'}</td></tr>
+      <tr><td>Amount</td><td>${escapeHtml(countText)}</td></tr>
+      ${alternatives}
+      <tr><td>Refined Value</td><td>${formatPrice(ore)}</td></tr>
+      <tr><td>Tier / Type</td><td>${escapeHtml(ore.tier)} / ${escapeHtml((ore.types || []).join(', ').toUpperCase())}</td></tr>
+      <tr><td>Crafting Use</td><td>${escapeHtml(ore.craft || '-')}</td></tr>
+      ${qualityHtml}
+    </table>
+    <div class="legend">${locations}</div>
+    ${ore.note ? `<p class="hud-raw">${escapeHtml(ore.note)}</p>` : ''}
+  `;
+}
+
+function renderNearReference(code, nearMatches = []){
+  const rows = Array.isArray(nearMatches) ? nearMatches : [];
+  if(!rows.length){
+    renderOreReference(null, null, []);
+    return;
+  }
+  document.getElementById('minerals').innerHTML = `
+    <table>
+      <tr><th colspan="2">No Exact RS Match</th></tr>
+      <tr><td>Scanned Value</td><td>${escapeHtml(code || 'Unknown')}</td></tr>
+      <tr><td>Closest</td><td>${rows.map(item => {
+        const amount = Number(item.display_units ?? item.units ?? 1);
+        return `${escapeHtml(item.name)} x${amount}<br><span class="hud-raw">expected ${escapeHtml(item.expected_rs)}, off by ${escapeHtml(item.difference)}</span>`;
+      }).join('<br>')}</td></tr>
+    </table>
+    <p class="hud-raw">This value is close to known totals, but it is not an exact ore RS signature.</p>
+  `;
+}
+
+function renderSavedData(data){
+  const items = Array.isArray(data?.sightings) ? data.sightings : [];
+  if(!items.length){
+    savedList.innerHTML = '<div class="hud-empty">No local ore sightings saved yet.</div>';
+    return;
+  }
+  savedList.innerHTML = items
+    .slice()
+    .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')))
+    .map(item => `<div class="saved-item"><strong>${escapeHtml(item.ore_name)}</strong><span>${escapeHtml(item.system)} / ${escapeHtml(item.location)}${item.quality !== null && item.quality !== undefined ? ' / Q' + escapeHtml(item.quality) : ''}</span></div>`)
+    .join('');
+}
+
+async function loadUserData(){
+  try {
+    const r = await fetch('/user-data');
+    renderSavedData(await r.json());
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+function updateOreOptions(rows){
+  if(!Array.isArray(rows) || !rows.length || oreReference.length){ return; }
+  oreReference = rows;
+  document.getElementById('oreOptions').innerHTML = rows
+    .map(ore => `<option value="${escapeHtml(ore.name)}"></option>`)
+    .join('');
+}
+
+function formatRawText(value){
+  const text = String(value || '').replace(/\s+/g, ' ').trim();
+  if(!text){ return ''; }
+  return 'raw OCR: ' + (text.length > 120 ? text.slice(0, 117) + '...' : text);
+}
+
+function formatScanRaw(status){
+  if(status?.ocr_error){
+    return 'OCR error: ' + status.ocr_error;
+  }
+  const raw = formatRawText(status?.raw_text);
+  if(raw){
+    const engine = status?.ocr_engine ? ` / ${status.ocr_engine}` : '';
+    const conf = Number(status?.ocr_confidence || 0);
+    const confidence = conf > 0 ? ` ${Math.round(conf * 100)}%` : '';
+    const suffix = `${engine}${confidence}`;
+    return status?.scan_in_progress ? raw + suffix + ' (last read)' : raw + suffix;
+  }
+  return status?.scan_in_progress ? 'raw OCR: waiting for read...' : '';
+}
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  saveButton.disabled = true;
+  formStatus.textContent = 'Saving...';
+  const data = Object.fromEntries(new FormData(form).entries());
+  try {
+    const r = await fetch('/user-data/material', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const j = await r.json();
+    if(!r.ok || !j.ok){
+      throw new Error(j.error || 'Unable to save material.');
+    }
+    formStatus.textContent = 'Saved locally.';
+    renderSavedData(j.data);
+    poll();
+  } catch(err) {
+    formStatus.textContent = err.message;
+  } finally {
+    saveButton.disabled = false;
+  }
+});
 
 async function poll(){
   try {
     const r = await fetch('/status?region='+region);
     const j = await r.json();
-    if(j.info){
-      let text = j.info.name;
-      if(j.info.deposits){ text += " x" + j.info.deposits; }
-      document.getElementById('name').textContent = text;
-      document.getElementById('code').textContent = "Code: " + (j.code ?? "");
-      document.getElementById('raw').textContent = j.code_raw ? ("(raw: " + j.code_raw + ", conf " + j.confidence.toFixed(2) + ")") : "";
-      const info = j.info || {};
-      const category = info.category || '';
-      if(Array.isArray(j.table) && j.table.length){
-        renderTable(j.table);
-      } else {
-        showEmptyState(category);
+    updateOreOptions(j.ore_reference);
+    const rawLine = formatScanRaw(j);
+    if(j.ore){
+      const matches = Array.isArray(j.ore_matches) ? j.ore_matches : [];
+      document.getElementById('name').textContent = matches.length > 1 ? "Multiple matches" : formatOreTitle(j.ore);
+      const rsText = j.ore.scan_rs ? "Scanned RS: " + j.ore.scan_rs : (j.ore.rs ? "Base RS: " + j.ore.rs : "RS: Unknown");
+      document.getElementById('code').textContent = rsText;
+      document.getElementById('raw').textContent = rawLine;
+      renderOreReference(j.ore, j.quality, matches);
+      if(!document.getElementById('oreName').value){ document.getElementById('oreName').value = j.ore.name; }
+      hasRenderedOreMatch = true;
+    } else {
+      const nearMatches = Array.isArray(j.near_ore_matches) ? j.near_ore_matches : [];
+      document.getElementById('raw').textContent = rawLine;
+      if(!hasRenderedOreMatch && !j.scan_in_progress){
+        document.getElementById('name').textContent = nearMatches.length ? "No exact RS match" : "No ore match";
+        document.getElementById('code').textContent = j.code ? "RS/Text: " + j.code : "";
+        renderNearReference(j.code, nearMatches);
       }
     }
   } catch(e){ console.error(e); }
   setTimeout(poll, 500);
 }
 poll();
+loadUserData();
 </script>
 </body>
 </html>

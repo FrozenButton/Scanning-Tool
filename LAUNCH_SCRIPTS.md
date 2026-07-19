@@ -77,7 +77,8 @@ Scanning-Tool/
 ├── scan_deposits.py         # Main application
 ├── requirements.txt         # Python dependencies
 ├── config.json             # App config (created on first run)
-├── RockTypes_2025-09-16.json # Rock data
+├── starminers_ore_data.json  # Star Miners ore reference data
+├── user_rock_data.json       # Local ore sightings
 ├── templates/              # Flask templates
 ├── venv/                   # Virtual environment (auto-created)
 └── python/                 # Portable Python (Windows only, auto-created)

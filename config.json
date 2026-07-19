@@ -1,29 +1,42 @@
 {
     "CAP_REGION": {
-        "left": 1146,
-        "top": 277,
-        "width": 185,
-        "height": 30
+        "left": 1211,
+        "top": 452,
+        "width": 152,
+        "height": 43
     },
-    "label_color": "#4bf569",
+    "label_color": "#c1e25f",
     "AUTO_ALIGN_ENABLED": true,
     "ANCHOR_REGION": {
-        "left": 1100,
-        "top": 240,
-        "width": 320,
-        "height": 140
+        "left": 1032,
+        "top": 269,
+        "width": 546,
+        "height": 408
     },
     "ANCHOR_OFFSET": {
-        "x": 36,
-        "y": 56
+        "x": 28,
+        "y": 1
     },
     "ANCHOR_THRESHOLD": 0.82,
     "ANCHOR_TEMPLATE_DIR": "assets/anchor_templates",
     "ALIGNMENT_POLL_INTERVAL_MS": 500,
-    "CONTINUOUS_CAPTURE_INTERVAL": 2.0,
+    "CONTINUOUS_CAPTURE_INTERVAL": 0.5,
+    "OLLAMA_KEEP_ALIVE": "30m",
+    "OLLAMA_NUM_PREDICT": 32,
+    "OLLAMA_REQUEST_TIMEOUT": 30.0,
+    "OLLAMA_FALLBACK_ENABLED": false,
+    "FAST_OCR_ENABLED": true,
+    "FAST_OCR_MIN_CONFIDENCE": 0.65,
     "INFO_OVERLAY_OFFSET": {
-        "x": 0,
+        "x": -4,
         "y": 0
     },
+    "MATCH_BOX_ENABLED": false,
+    "MATCH_BOX_OFFSET": {
+        "x": 900,
+        "y": 471
+    },
+    "MATCH_BOX_SCALE": 0.6,
+    "MATCH_BOX_OPACITY": 0.75,
     "OLLAMA_HOST": ""
 }
